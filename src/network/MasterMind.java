@@ -77,7 +77,7 @@ public class MasterMind implements Runnable {
 
             String stringmess = datagrampacketTostring(recv);
             //if its a pulse from itself , just ignore it
-            if (!stringmess.equals(sender.getMyPulse())) {
+            if (!stringmess.substring(0,4).equals(sender.getMyPulse())) {
                 receiver.dealWithMessage(stringmess);
         }
         }
