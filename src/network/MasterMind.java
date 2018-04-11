@@ -9,6 +9,10 @@ import java.util.HashMap;
 public class MasterMind {
 
 
+    public static final String ACK = "a";
+    public static final String MESSAGE = "m";
+    public static final String PULSE = "p";
+
     //list keeping track of clinets in the network
     private ArrayList<String> nodeOnline;
     //own name
