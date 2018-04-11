@@ -75,10 +75,11 @@ public class MasterMind implements Runnable {
                 System.err.println("Could not receive window");
             }
 
+            String stringmess = datagrampacketTostring(recv);
             //if its a pulse from itself , just ignore it
-            if (!datagrampacketTostring(recv).equals(sender.getMyPulse())) {
-                receiver.dealWithMessage(datagrampacketTostring(recv));
-            }
+            if (!stringmess.equals(sender.getMyPulse())) {
+                receiver.dealWithMessage(stringmess);
+        }
         }
     }
 

@@ -83,7 +83,7 @@ public class Sender implements  Runnable{
      */
     public void sendAck(String destination, int seqaceNr){
         String ack = destination
-                    +mind.getOwnName()
+                    + mind.getOwnName()
                     + "3"
                     + mind.ACK;
 
