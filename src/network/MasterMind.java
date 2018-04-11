@@ -17,8 +17,10 @@ public class MasterMind {
     private HashMap<String, Integer> seqNrs;
     //the socket used for receding and sending packages
     private MulticastSocket sock;
+
     private Sender sender;
     private Receiver receiver;
+
     private static final int port = 2629;
     private InetAddress group;
 
@@ -30,12 +32,26 @@ public class MasterMind {
             sock = new MulticastSocket(port);
             group = InetAddress.getByName("228.0.0.0");
             sock.joinGroup(group);
-            sender = new Sender(sock);
-            receiver = new Receiver(sock);
+            sender = new Sender(sock, this);
+            receiver = new Receiver(sock, this);
         } catch (IOException e){
             System.err.println("Could not connect to port or IPgroup");
         }
     }
+
+    public HashMap<String, Integer> getSeqNers(){
+        return seqNrs;
+    }
+
+    public ArrayList<String> getNodeOnline(){
+        return nodeOnline;
+    }
+
+    public String getOwnName(){
+        return  ownName;
+    }
+
+
 
 
 }
