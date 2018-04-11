@@ -22,6 +22,9 @@ public class Sender implements  Runnable{
         this.sock = socket;
         this.mind = mind;
 
+        outStanding = new HashMap<String, Boolean>();
+        timeouts = new HashMap<String, Long>();
+
         mypulse = mind.getOwnName() //the name
                 + mind.getOwnName() // it is double so the protocol is respected
                 + "3" // time to live
@@ -90,6 +93,10 @@ public class Sender implements  Runnable{
         send(ack);
     }
 
+    public void receivedAck(String source){
+        outStanding.put(source, false);
+    }
+
 
 
 
@@ -112,7 +119,7 @@ public class Sender implements  Runnable{
             try {
                 TimeUnit.SECONDS.sleep(1);
             } catch (InterruptedException e) {
-                System.err.println("could not wait,for soem reason");
+                System.err.println("could not wait in Sender -> run,for some reason");
             }
         }
     }
@@ -145,5 +152,9 @@ public class Sender implements  Runnable{
         return mypulse;
     }
 
+
+    public HashMap<String, Boolean> getoutStanding(){
+        return outStanding;
+    }
 
 }

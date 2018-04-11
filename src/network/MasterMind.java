@@ -8,6 +8,7 @@ import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
 
 public class MasterMind implements Runnable {
 
@@ -22,15 +23,17 @@ public class MasterMind implements Runnable {
 
     //list keeping track of clinets in the network
     private ArrayList<String> nodeOnline;
+
     //own name
     private String ownName;
+
     //list to keep track of sequance numbers with other nodes
     private HashMap<String, Integer> seqNrs;
+
     //the socket used for receding and sending packages
     private MulticastSocket sock;
 
-    //this keeps in mind each time it receives a pulse from a node so it knows it's in the network
-    private HashMap<String, Long> statuses;
+
 
     private Sender sender;
     private Receiver receiver;
@@ -99,6 +102,15 @@ public class MasterMind implements Runnable {
      * the thread will end after the node receives and ack for that sent message
      */
     public void sendMessage(String message){
+
+        while(sender.getoutStanding().get(message.substring(0,1)) == true){
+            try {
+                TimeUnit.MILLISECONDS.sleep(10);
+            } catch (InterruptedException e) {
+                System.err.println("could not wait int Mastermind SendMessage,for some reason");
+            }
+        }
+
         new Thread(() -> sender.sendMessage(message)).start();
 
     }
