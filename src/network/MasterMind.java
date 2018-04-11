@@ -77,7 +77,11 @@ public class MasterMind {
         return on;
     }
 
+    public Sender getSender(){
+        return this.sender;
+    }
 
-
-
+    public Receiver getReceiver() {
+        return receiver;
+    }
 }

@@ -43,28 +43,26 @@ public class Sender implements  Runnable{
 
         }
 
-        try {
-            sock.send(stringTodatagrampacket(mesg));
-        } catch (IOException e){
-            System.err.println("Unable to send message in Sender");
-        }
+        send(mesg);
 
     }
-
-
 
 
 
     /**
-     * Make a String into a Datagram
-     * @param message the message being converted
-     * @return the message converted
+     * this sends an Acknowledgement package into the network
+     * @param destination of the ack
+     * @param seqaceNr the seq nr it is acknowledging
      */
-    public DatagramPacket stringTodatagrampacket(String message){
-        DatagramPacket result = new DatagramPacket(message.getBytes(),message.length(),
-                mind.getGroup(), mind.getPort());
-        return result;
+    public void sendAck(String destination, int seqaceNr){
+        String ack = destination
+                    + "4"
+                    + mind.ACK;
+
+        send(ack);
     }
+
+
 
 
     /**
@@ -76,11 +74,7 @@ public class Sender implements  Runnable{
                 + "4" // time to live
                 + mind.PULSE; // type of message
 
-        try {
-            sock.send(stringTodatagrampacket(pulse));
-        } catch (IOException e){
-            System.err.println("Unable to send message in Sender");
-        }
+        send(pulse);
 
     }
 
@@ -98,4 +92,28 @@ public class Sender implements  Runnable{
             }
         }
     }
+
+    /**
+     * this fucntions takes a message, makes it into a datagrampackage and sends it into the network
+     * @param message
+     */
+    public void send(String message){
+        try {
+            sock.send(stringTodatagrampacket(message));
+        } catch (IOException e){
+            System.err.println("Unable to send message in Sender");
+        }
+    }
+
+    /**
+     * Make a String into a Datagram
+     * @param message the message being converted
+     * @return the message converted
+     */
+    public DatagramPacket stringTodatagrampacket(String message){
+        DatagramPacket result = new DatagramPacket(message.getBytes(),message.length(),
+                mind.getGroup(), mind.getPort());
+        return result;
+    }
+
 }

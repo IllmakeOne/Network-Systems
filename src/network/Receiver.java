@@ -13,4 +13,29 @@ public class Receiver {
         this.sock = socket;
         this.mind = mind;
     }
+
+    public void dealWithMessage(String message){
+        if(message.substring(2,3).equals(mind.ACK)){
+            dealtwithAck(message);
+        } else if(message.substring(2,3).equals(mind.PULSE)){
+            dealwithPulse(message);
+        } else if (message.substring(2,3).equals(mind.MESSAGE)){
+            dealwithMessage(message;
+        } else {
+            System.out.println("Unrecognised message");
+        }
+    }
+
+    public void dealwithPulse(String message){
+
+    }
+
+
+    public void dealtwithAck(String message){
+
+    }
+
+    public void dealwithMessage(String message){
+
+    }
 }
