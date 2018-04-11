@@ -12,6 +12,7 @@ public class Sender implements  Runnable{
     private MasterMind mind;
     // map of the nodes still waiting for a reply
     private HashMap<String, Boolean> outStanding;
+    private String mypulse = "";
 
     //map of timeouts
     private HashMap<String, Long> timeouts;
@@ -20,14 +21,21 @@ public class Sender implements  Runnable{
     public Sender(MulticastSocket socket, MasterMind mind){
         this.sock = socket;
         this.mind = mind;
+
+        mypulse = mind.getOwnName() //the name
+                + mind.getOwnName() // it is double so the protocol is respected
+                + "3" // time to live
+                + mind.PULSE; // type of message
+
     }
 
     /**
      * the protocol is:
      * on first index of the string it is the destination, to whome its going
-     * on the second index its it's time to live
-     * on the third index is the type of message, ack synch(pulse) or a message
-     * on the 4th index is the seq number
+     * the second index is where the package is from
+     * on the third index its it's time to live
+     * on the 4th index is the type of message, ack synch(pulse) or a message
+     * on the 5th index is the seq number 0 or 1
      * and the rest is the encoded message
      * @param mtbs = message to be sent
      *
@@ -38,18 +46,17 @@ public class Sender implements  Runnable{
 
         String detination = mtbs.substring(0,1);
         String mesg = detination //destination
-                + "4" // time to live
+                + mind.getOwnName() // source
+                + "3" // time to live
                 + mind.MESSAGE // type of message
                 + mind.getSeqNers().get(mtbs.substring(0, 1)) // seq number
                 + mind.getSecurity().encrypt(detination,mtbs.substring(1)); // encoded message
 
         //change the sequance number asociated to a node
-        if(mind.getSeqNers().get(detination) == 9){
-            mind.getSeqNers().put(detination,0);
+        if(mind.getSeqNers().get(detination) == 0){
+            mind.getSeqNers().put(detination,1);
         } else {
-            // increse the seq number fo a node by one
-            mind.getSeqNers().put(detination,
-                    mind.getSeqNers().get(detination));
+            mind.getSeqNers().put(detination,0);
 
         }
 
@@ -76,7 +83,8 @@ public class Sender implements  Runnable{
      */
     public void sendAck(String destination, int seqaceNr){
         String ack = destination
-                    + "4"
+                    +mind.getOwnName()
+                    + "3"
                     + mind.ACK;
 
         send(ack);
@@ -90,11 +98,7 @@ public class Sender implements  Runnable{
      * Each pulse is of the form name+time to live + type of msesage
      */
     public void sendPulse(){
-        String pulse = mind.getOwnName() //the name
-                + "3" // time to live
-                + mind.PULSE; // type of message
-
-        send(pulse);
+        send(mypulse);
 
     }
 
@@ -136,6 +140,10 @@ public class Sender implements  Runnable{
         return result;
     }
 
+
+    public String getMyPulse(){
+        return mypulse;
+    }
 
 
 }
