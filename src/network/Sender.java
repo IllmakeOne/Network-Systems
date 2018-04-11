@@ -25,11 +25,21 @@ public class Sender {
      * @param mtbs = message to be sent
      */
     public void sendMessage(String mtbs){
-        String mesg = mtbs.substring(0, 1)
-                + "4"
-                + mind.MESSAGE
-                + mind.getSeqNers().get(mtbs.substring(0, 1))
-                + mind.getSecurity().encode(mtbs.charAt(0),mtbs.substring(1));
+        String mesg = mtbs.substring(0, 1) //destination
+                + "4" // time to live
+                + mind.MESSAGE // type of message
+                + mind.getSeqNers().get(mtbs.substring(0, 1)) // seq number
+                + mind.getSecurity().encode(mtbs.charAt(0),mtbs.substring(1)); // encoded message
+
+        //change the sequance number asociated to a node
+        if(mind.getSeqNers().get(mtbs.substring(0, 1)) == 9){
+            mind.getSeqNers().put(mtbs.substring(0, 1),0);
+        } else {
+            // increse the seq number fo a node by one
+            mind.getSeqNers().put(mtbs.substring(0, 1),
+                    mind.getSeqNers().get(mtbs.substring(0, 1)));
+
+        }
 
     }
 
