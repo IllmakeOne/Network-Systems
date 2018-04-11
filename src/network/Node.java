@@ -58,11 +58,11 @@ public class Node {
         return  result;
     }
 
-    public void dealWithmessage(String mess){
-        if (mess.charAt(0) == "5"){
-            //updateNetwork(mess.charAt(1));
-        }
-    }
+//    public void dealWithmessage(String mess){
+//        if (mess.charAt(0) == "5"){
+//            //updateNetwork(mess.charAt(1));
+//        }
+//    }
 
 //    /**
 //     */
@@ -82,9 +82,7 @@ public class Node {
         int x;
         x =4;
         x+=4;
-        HashMap<String,String> map = new HashMap<>();
-        map.put("gay","fale");
-        map.put("gy","fale");
+        System.out.println("jamaica".substring(1));
 
 
 

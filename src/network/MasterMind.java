@@ -24,10 +24,13 @@ public class MasterMind {
     private static final int port = 2629;
     private InetAddress group;
 
+    private Security keys;
+
 
     public MasterMind(String name){
         ownName = name;
         seqNrs = new HashMap<>();
+        keys = new Security();
         try {
             sock = new MulticastSocket(port);
             group = InetAddress.getByName("228.0.0.0");
@@ -49,6 +52,18 @@ public class MasterMind {
 
     public String getOwnName(){
         return  ownName;
+    }
+
+    public InetAddress getGroup(){
+        return group;
+    }
+
+    public int getPort(){
+        return port;
+    }
+
+    public Security getSecurity(){
+        return keys;
     }
 
 
