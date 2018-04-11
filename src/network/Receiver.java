@@ -17,21 +17,20 @@ public class Receiver {
     }
 
     public void dealWithMessage(String message){
-       // if()
 
-
-//        if(message.substring(2,3).equals(mind.ACK)){
-//            dealtwithAck(message);
-//        } else if(message.substring(2,3).equals(mind.PULSE)){
-//            dealwithPulse(message);
-//        } else if (message.substring(2,3).equals(mind.MESSAGE)){
-//            dealwithMessage(message;
-//        } else {
-//            System.out.println("Unrecognised message");
-//        }
+        if(message.substring(2,3).equals(mind.ACK)){
+            dealtwithAck(message);
+        } else if(message.substring(2,3).equals(mind.PULSE)){
+            dealwithPulse(message);
+        } else if (message.substring(2,3).equals(mind.MESSAGE)){
+            dealwithMessage(message;
+        } else {
+            System.out.println("Unrecognised message");
+        }
     }
 
     public void dealwithPulse(String message){
+
 
     }
 
@@ -41,6 +40,10 @@ public class Receiver {
     }
 
     public void dealwithMessage(String message){
+
+    }
+
+    public void forwardPack(String message){
 
     }
 }

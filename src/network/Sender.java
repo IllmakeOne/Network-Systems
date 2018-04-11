@@ -91,7 +91,7 @@ public class Sender implements  Runnable{
      */
     public void sendPulse(){
         String pulse = mind.getOwnName() //the name
-                + "4" // time to live
+                + "3" // time to live
                 + mind.PULSE; // type of message
 
         send(pulse);

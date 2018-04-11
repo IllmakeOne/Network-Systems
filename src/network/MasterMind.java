@@ -1,18 +1,20 @@
 package network;
 
 import java.io.IOException;
+import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.util.ArrayList;
 import java.util.HashMap;
 
-public class MasterMind {
+public class MasterMind implements Runnable {
 
 
     public static final String ACK = "a";
     public static final String MESSAGE = "m";
     public static final String PULSE = "p";
     public static final int TIMEOUTLIMIT = 1000;
+    public static final int OUTOFNETWORKTIMEOUT = 3000;
 
     private boolean on;
 
@@ -24,6 +26,9 @@ public class MasterMind {
     private HashMap<String, Integer> seqNrs;
     //the socket used for receding and sending packages
     private MulticastSocket sock;
+
+    //this keeps in mind each time it receives a pulse from a node so it knows it's in the network
+    private HashMap<String, Long> statuses;
 
     private Sender sender;
     private Receiver receiver;
@@ -50,9 +55,50 @@ public class MasterMind {
         }
     }
 
+    @Override
+    public void run() {
+
+        //start a new thread which will pulse each second
+        Thread pulsing = new Thread(sender);
+        pulsing.start();
+
+        //while is on, keeping looking for packs to receive
+        while(on){
+            byte[] buf = new byte[1000];
+            DatagramPacket recv = new DatagramPacket(buf, buf.length);
+
+            try {
+                sock.receive(recv);
+            } catch (IOException e) {
+                System.err.println("Could not receive window");
+            }
+
+            receiver.dealWithMessage(datagrampacketTostring(recv));
+        }
+    }
+
+
+    /**
+     * take a datagram packet and convert it into a string
+     * @param pack, the datagram packet being decoded
+     * @return the message in the datagram
+     */
+    public String datagrampacketTostring ( DatagramPacket pack){
+        String result = new String(pack.getData());
+        return  result;
+    }
+
+    /**
+     * this will start a new thread for sending a message
+     * the thread will end after the node receives and ack for that sent message
+     */
     public void sendMessage(String message){
         new Thread(() -> sender.sendMessage(message)).start();
 
+    }
+
+    public void turnOff(){
+        this.on = false;
     }
 
     public HashMap<String, Integer> getSeqNers(){
@@ -90,4 +136,9 @@ public class MasterMind {
     public Receiver getReceiver() {
         return receiver;
     }
+
+
+
+
+
 }
