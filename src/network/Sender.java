@@ -1,10 +1,12 @@
 package network;
 
+import java.io.IOException;
 import java.net.DatagramPacket;
 import java.net.MulticastSocket;
 import java.util.HashMap;
+import java.util.concurrent.TimeUnit;
 
-public class Sender {
+public class Sender implements  Runnable{
 
     private MulticastSocket sock;
     private MasterMind mind;
@@ -41,6 +43,12 @@ public class Sender {
 
         }
 
+        try {
+            sock.send(stringTodatagrampacket(mesg));
+        } catch (IOException e){
+            System.err.println("Unable to send message in Sender");
+        }
+
     }
 
 
@@ -56,5 +64,38 @@ public class Sender {
         DatagramPacket result = new DatagramPacket(message.getBytes(),message.length(),
                 mind.getGroup(), mind.getPort());
         return result;
+    }
+
+
+    /**
+     * this is a pulse, its purpose is to inform the other in the netwrok that they are alive
+     * Each pulse is of the form name+time to live + type of msesage
+     */
+    public void sendPulse(){
+        String pulse = mind.getOwnName() //the name
+                + "4" // time to live
+                + mind.PULSE; // type of message
+
+        try {
+            sock.send(stringTodatagrampacket(pulse));
+        } catch (IOException e){
+            System.err.println("Unable to send message in Sender");
+        }
+
+    }
+
+    /**
+     * start sending a pulse each second
+     */
+    @Override
+    public void run() {
+        while(mind.getStatus()){
+            sendPulse();
+            try {
+                TimeUnit.SECONDS.sleep(1);
+            } catch (InterruptedException e) {
+                System.err.println("could not wait,for soem reason");
+            }
+        }
     }
 }

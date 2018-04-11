@@ -13,6 +13,8 @@ public class MasterMind {
     public static final String MESSAGE = "m";
     public static final String PULSE = "p";
 
+    private boolean on;
+
     //list keeping track of clinets in the network
     private ArrayList<String> nodeOnline;
     //own name
@@ -35,6 +37,7 @@ public class MasterMind {
         ownName = name;
         seqNrs = new HashMap<>();
         keys = new Security();
+        on = true;
         try {
             sock = new MulticastSocket(port);
             group = InetAddress.getByName("228.0.0.0");
@@ -68,6 +71,10 @@ public class MasterMind {
 
     public Security getSecurity(){
         return keys;
+    }
+
+    public boolean getStatus(){
+        return on;
     }
 
 
