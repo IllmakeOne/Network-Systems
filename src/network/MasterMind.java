@@ -12,6 +12,7 @@ public class MasterMind {
     public static final String ACK = "a";
     public static final String MESSAGE = "m";
     public static final String PULSE = "p";
+    public static final int TIMEOUTLIMIT = 1000;
 
     private boolean on;
 
@@ -47,6 +48,11 @@ public class MasterMind {
         } catch (IOException e){
             System.err.println("Could not connect to port or IPgroup");
         }
+    }
+
+    public void sendMessage(String message){
+        new Thread(() -> sender.sendMessage(message)).start();
+
     }
 
     public HashMap<String, Integer> getSeqNers(){

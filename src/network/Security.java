@@ -5,7 +5,15 @@ import javax.crypto.spec.SecretKeySpec;
 
 public class Security {
 
-   
+
+
+    public static String encrypt(String strClearText,String strKey){
+        return  "";
+    }
+
+    public static String decrypt(String strEncrypted,String strKey) throws Exception {
+        return "";
+    }
 /**public static String encrypt(String strClearText,String strKey) throws Exception{
 	String strData="";
 	

@@ -10,6 +10,11 @@ public class Sender implements  Runnable{
 
     private MulticastSocket sock;
     private MasterMind mind;
+    // map of the nodes still waiting for a reply
+    private HashMap<String, Boolean> outStanding;
+
+    //map of timeouts
+    private HashMap<String, Long> timeouts;
 
 
     public Sender(MulticastSocket socket, MasterMind mind){
@@ -25,25 +30,40 @@ public class Sender implements  Runnable{
      * on the 4th index is the seq number
      * and the rest is the encoded message
      * @param mtbs = message to be sent
+     *
+     * this will run in a new thread and will terminate when it received an ack
+     *
      */
     public void sendMessage(String mtbs){
-        String mesg = mtbs.substring(0, 1) //destination
+
+        String detination = mtbs.substring(0,1);
+        String mesg = detination //destination
                 + "4" // time to live
                 + mind.MESSAGE // type of message
                 + mind.getSeqNers().get(mtbs.substring(0, 1)) // seq number
-                + mind.getSecurity().encode(mtbs.charAt(0),mtbs.substring(1)); // encoded message
+                + mind.getSecurity().encrypt(detination,mtbs.substring(1)); // encoded message
 
         //change the sequance number asociated to a node
-        if(mind.getSeqNers().get(mtbs.substring(0, 1)) == 9){
-            mind.getSeqNers().put(mtbs.substring(0, 1),0);
+        if(mind.getSeqNers().get(detination) == 9){
+            mind.getSeqNers().put(detination,0);
         } else {
             // increse the seq number fo a node by one
-            mind.getSeqNers().put(mtbs.substring(0, 1),
-                    mind.getSeqNers().get(mtbs.substring(0, 1)));
+            mind.getSeqNers().put(detination,
+                    mind.getSeqNers().get(detination));
 
         }
 
         send(mesg);
+
+        outStanding.put(mesg.substring(0,1),true);//note down its waiting for an ack
+        timeouts.put(detination, System.currentTimeMillis());//note down time for the timeout calcualtion
+
+        while(outStanding.get(detination) == true){
+            if (System.currentTimeMillis() - timeouts.get(detination) > mind.TIMEOUTLIMIT){
+                timeouts.put(detination, System.currentTimeMillis());
+                send(mesg);
+            }
+        }
 
     }
 
@@ -115,5 +135,7 @@ public class Sender implements  Runnable{
                 mind.getGroup(), mind.getPort());
         return result;
     }
+
+
 
 }
