@@ -60,7 +60,7 @@ public class Node {
 
     public void dealWithmessage(String mess){
         if (mess.charAt(0) == "5"){
-            updateNetwork(mess.charAt(1));
+            //updateNetwork(mess.charAt(1));
         }
     }
 
