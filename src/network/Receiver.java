@@ -17,13 +17,13 @@ public class Receiver {
     }
 
     public void dealWithMessage(String message){
-
+    	System.out.println(message);
         if(message.substring(2,3).equals(mind.ACK)){
             dealtwithAck(message);
         } else if(message.substring(2,3).equals(mind.PULSE)){
             dealwithPulse(message);
         } else if (message.substring(2,3).equals(mind.MESSAGE)){
-            dealwithMessage(message;
+            dealwithMessage(message);
         } else {
             System.out.println("Unrecognised message");
         }
