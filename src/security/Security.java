@@ -8,11 +8,11 @@ public class Security {
 
 
     public static String encrypt(String strClearText,String strKey){
-        return  "";
+        return  "test";
     }
 
     public static String decrypt(String strEncrypted,String strKey) throws Exception {
-        return "";
+        return "test";
     }
 /**public static String encrypt(String strClearText,String strKey) throws Exception{
 	String strData="";
