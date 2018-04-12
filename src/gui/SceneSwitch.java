@@ -11,6 +11,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.TextArea;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
+import network.MasterMind;
+
 import java.util.ArrayList;
 
 /*
@@ -23,6 +25,7 @@ public class SceneSwitch extends Application {
     private static final int PADDING = 10;
     private static final int INPUT_CHAT_HEIGHT = 50;
     private static final int NUM_OF_CHATS = 5;
+    private MasterMind masterMind;
     private String SOURCE;
     private Stage window;
 
@@ -210,6 +213,12 @@ public class SceneSwitch extends Application {
         System.out.println("SEND TO " + windowId + " FROM " + SOURCE);
 
         String text = chatAreas[windowId].getText();
+        System.out.println(text);
+
+        String outMessage = String.valueOf(windowId) + text;
+        masterMind.sendMessage(outMessage);
+
+        // add it to chat log
         onMessageReceived(text, windowId);
 
         chatAreas[windowId].setText("");
@@ -227,8 +236,9 @@ public class SceneSwitch extends Application {
         Constructor
      */
 
-    public SceneSwitch(String source) {
+    public SceneSwitch(String source, MasterMind masterMind) {
         SOURCE = source;
+        this.masterMind = masterMind;
     }
 
     /*
