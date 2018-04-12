@@ -25,7 +25,6 @@ public class Sender implements  Runnable{
 
         outStanding = new HashMap<String, Boolean>();
         timeouts = new HashMap<>();
-        outStanding.put("1",false);
       //  timeouts = new HashMap<String, Long>();
 
         mypulse = mind.getOwnName() //the name

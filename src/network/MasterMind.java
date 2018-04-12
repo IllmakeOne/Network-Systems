@@ -20,7 +20,7 @@ public class MasterMind implements Runnable {
     public static final String MESSAGE = "m";
     public static final String PULSE = "p";
     public static final int TIMEOUTLIMIT = 1000;
-    public static final int OUTOFNETWORKTIMEOUT = 5000;
+    public static final int OUTOFNETWORKTIMEOUT = 3000;
 
     private boolean on;
 
@@ -56,6 +56,7 @@ public class MasterMind implements Runnable {
 
         ownName = name;
 
+        this.gui = gui;
 
         seqNrs = new HashMap<>();
         keys = new Security();
@@ -126,7 +127,7 @@ public class MasterMind implements Runnable {
      */
     public void sendMessage(String message){
 
-
+        System.out.println(message + " In send msessage MAstermind");
         if(receiver.getStatuses().keySet().contains(message.substring(0,1))){
             while (sender.getoutStanding().get(message.substring(0, 1))) {
                 try {

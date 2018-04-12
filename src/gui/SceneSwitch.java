@@ -228,7 +228,7 @@ public class SceneSwitch extends Application{
         System.out.println(text);
 
         String outMessage = String.valueOf(windowId) + text;
-        System.out.println(outMessage);
+        //System.out.println(outMessage);
 
         masterMind.sendMessage(outMessage);
 

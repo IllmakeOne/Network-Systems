@@ -61,6 +61,7 @@ public class Receiver {
             System.out.println(" node was aded to peopel onlin" + message.substring(0,1));
             statuses.put(message.substring(0,1),System.currentTimeMillis());
             mind.getSeqNers().put(message.substring(0,1),"0");
+            mind.getSender().getoutStanding().put(message.substring(0,1),false);
         }
         statuses.put(message.substring(0,1),System.currentTimeMillis());
 
@@ -107,7 +108,9 @@ public class Receiver {
        } else {
 
            // ADD FOR GROUP CHAT
+
            //send to upper layer
+         //  System.out.println(mess + " " +Integer.valueOf(message.substring(1, 2)));
            mind.getGui().onMessageReceived(mess, Integer.valueOf(message.substring(1, 2)));
        }
 
@@ -123,13 +126,24 @@ public class Receiver {
      * @param message
      */
     public void forwardPack(String message){
-        if(!message.substring(0,1).equals(mind.getOwnName())) { //if the message is for itself, do not forward it
-            String reformatedMessage = message.substring(0, 2);
-            int stupid = Integer.valueOf(message.substring(2, 3)) - 1;
-            if (!message.substring(2, 3).equals("0")) { //if the package's time to live is 0 do not forward it
-                reformatedMessage = reformatedMessage + stupid + message.substring(3);
-                mind.getSender().send(reformatedMessage);
+        if(!message.substring(2,3).equals("0")){
+            if(!message.substring(1,2).equals(mind.getOwnName())){
+                int lowerTTL = Integer.valueOf(message.substring(2,3))-1;
+                String lowerTTLmessage = message.substring(0,2) + lowerTTL + message.substring(3);
+                mind.getSender().send(lowerTTLmessage);
             }
         }
     }
+//        if(!message.substring(0,1).equals(mind.getOwnName())) { //if the message is for itself, do not forward it
+//            String reformatedMessage = message.substring(0, 2);
+//
+//            int stupid = Integer.valueOf(message.substring(2, 3)) - 1;
+//          //  System.out.println(stupid+ " in foward");
+//
+//            if (!message.substring(2, 3).equals("0")) { //if the package's time to live is 0 do not forward it
+//                reformatedMessage = reformatedMessage + stupid + message.substring(3);
+//                mind.getSender().send(reformatedMessage);
+//            }
+//        }
+//    }
 }
