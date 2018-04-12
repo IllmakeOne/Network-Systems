@@ -12,7 +12,6 @@ import javafx.scene.control.TextArea;
 import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import network.MasterMind;
-
 import java.util.ArrayList;
 
 /*
@@ -41,11 +40,7 @@ public class SceneSwitch extends Application{
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-
         SOURCE = getParameters().getUnnamed().get(0);
-
-
-        System.out.println(getParameters());
         initializeLabels();
         initializeChatAreas();
         initializeMessages();
@@ -117,24 +112,6 @@ public class SceneSwitch extends Application{
         this.masterMind = new MasterMind(SOURCE, this);;
         Thread masternode = new Thread(masterMind);
         masternode.start();
-
-//        Thread t = new Thread() {
-//            public void run() {
-//                for (int i = 0; i < 5; i++) {
-//                    try {
-//                        Thread.sleep((long) (Math.random() * 1000));
-//                    } catch (InterruptedException e) {
-//                        e.printStackTrace();
-//                    }
-//
-//                    onMessageReceived("NEW", 1);
-//                    onMessageReceived("NEWW", 2);
-//                }
-//            }
-//        };
-
-
-      //  t.start();
     }
 
 
@@ -166,10 +143,6 @@ public class SceneSwitch extends Application{
         for (int i = 0; i < 5; i++) {
             messageCollections.add(new ArrayList<>());
         }
-
-        messageCollections.get(1).add("test");
-        messageCollections.get(1).add("this is a nice conversation");
-        messageCollections.get(1).add("aaa");
     }
 
     /*
@@ -228,7 +201,7 @@ public class SceneSwitch extends Application{
         System.out.println(text);
 
         String outMessage = String.valueOf(windowId) + text;
-        //System.out.println(outMessage);
+        System.out.println(outMessage);
 
         masterMind.sendMessage(outMessage);
 
@@ -247,14 +220,6 @@ public class SceneSwitch extends Application{
         launch(args);
 
     }
-
-//    public void initialize(String source) {
-//        SOURCE = source;
-//    }
-//
-//    public void initializeMind(MasterMind masterMind){
-//        this.masterMind = masterMind;
-//    }
 
     /*
         Fills the chat log with the messages that were sent
