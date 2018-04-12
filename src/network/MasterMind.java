@@ -59,6 +59,8 @@ public class MasterMind implements Runnable {
         this.gui = gui;
 
         seqNrs = new HashMap<>();
+        seqNrs.put("1","0");
+        seqNrs.put("2","0");
         keys = new Security();
         on = true;
         try {

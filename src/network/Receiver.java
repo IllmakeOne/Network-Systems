@@ -37,15 +37,18 @@ public class Receiver {
 
             if (type.equals(mind.PULSE)) {
                 dealwithPulse(message);
-            } else if(destination.equals(mind.getOwnName()) &&
-                        seq.equals(mind.getSeqNers().get(destination))){
-                if(type.equals(mind.ACK)){
-                    dealtwithAck(message);
-                } else {
-                    dealwithMessage(message);
-                }
+            } else if(destination.equals(mind.getOwnName())){
+                       if( seq.equals(mind.getSeqNers().get(destination))) {
+                           System.out.println(message);
+                           if (type.equals(mind.ACK)) {
+                               dealtwithAck(message);
+                           } else {
+                               dealwithMessage(message);
+                           }
+                       }
 
             }
+
 //        if(message.substring(3,4).equals(mind.PULSE)){
 //            dealwithPulse(message);
 //        } else if(message.substring(0,1).equals(mind.getOwnName())){
@@ -113,9 +116,8 @@ public class Receiver {
         String source = message.substring(0,1);
         String seq = message.substring(4,5);
 
-        if(seq.equals(mind.getSeqNers().get(source))){
-            mind.getSender().receivedAck(source);
-        }
+        mind.getSender().receivedAck(source);
+
 
         if(mind.getSeqNers().get(source).equals("9")){
             mind.getSeqNers().put(source,"0");
