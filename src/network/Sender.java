@@ -76,6 +76,8 @@ public class Sender implements  Runnable{
             }
         }
 
+        System.out.println("got Ack for " + mtbs);
+
         //change the sequance number asociated to a node
         if(mind.getSeqNers().get(detination).equals("9")){
             mind.getSeqNers().put(detination,"0");

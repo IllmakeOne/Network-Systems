@@ -123,7 +123,7 @@ public class Receiver {
             mind.getSeqNers().put(source,"0");
         } else {
             mind.getSeqNers().put(source,
-                    String.valueOf(Integer.valueOf(mind.getSeqNers().get(source)) -1));
+                    String.valueOf(Integer.valueOf(mind.getSeqNers().get(source)) +1 ));
         }
 
     }
@@ -131,6 +131,7 @@ public class Receiver {
     public void dealwithMessage(String message){
        String mess = mind.getSecurity().decrypt(message.substring(5), message.substring(0,1));
        String destination = message.substring(0,1);
+        String source = message.substring(0,1);
         //arecentMessage.put(message.substring(1,2), message.g)
 
        if(destination.equals("0")){
@@ -141,6 +142,12 @@ public class Receiver {
            //send to upper layer
          //  System.out.println(mess + " " +Integer.valueOf(message.substring(1, 2)));
            mind.getGui().onMessageReceived(mess, Integer.valueOf(message.substring(1, 2)));
+           if(mind.getSeqNers().get(source).equals("9")){
+               mind.getSeqNers().put(source,"0");
+           } else {
+               mind.getSeqNers().put(source,
+                       String.valueOf(Integer.valueOf(mind.getSeqNers().get(source)) +1 ));
+           }
        }
 
         // send ack package back to sender
