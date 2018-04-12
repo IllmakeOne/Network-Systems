@@ -26,21 +26,26 @@ public class Receiver {
 
     public void dealWithPacket(String message){
 
+        if(!message.substring(1,2).equals(mind.getOwnName())) {
 
+            if (message.substring(3, 4).equals(mind.PULSE)) {
+                dealwithPulse(message);
 
-        if(message.substring(3,4).equals(mind.PULSE)){
-            dealwithPulse(message);
-        } else if(message.substring(0,1).equals(mind.getOwnName())){
-            System.out.println(message);
-            if(message.substring(3,4).equals(mind.ACK)){
+            } else if (message.substring(0, 1).equals(mind.getOwnName())) {
+                System.out.println(message);
+                if(mind.getSeqNers().get(message).substring(1,2).equals(message.substring(4,5))) {
+                    if (message.substring(3, 4).equals(mind.ACK)) {
 
-                dealtwithAck(message);
-            } else {
-                dealwithMessage(message);
+                        dealtwithAck(message);
+                    } else {
+
+                        dealwithMessage(message);
+                    }
+                }
             }
-        }
 
-        forwardPack(message);
+            forwardPack(message);
+        }
     }
 
 
