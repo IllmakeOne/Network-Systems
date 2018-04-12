@@ -89,9 +89,12 @@ public class Receiver {
     }
 
     public void dealwithMessage(String message){
-     //  String mess = message.substring(1,2) + mind.getSecurity().decrypt(message.substring(5));
+       String mess = mind.getSecurity().decrypt(message.substring(5), message.substring(0,1));
 
+
+       // ADD FOR GROUP CHAT
         //send to upper layer
+        mind.getGui().onMessageReceived(mess, Integer.valueOf(message.substring(1,2)));
 
 
         // send ack package back to sender

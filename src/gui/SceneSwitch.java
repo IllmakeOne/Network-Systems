@@ -246,7 +246,7 @@ public class SceneSwitch extends Application {
         This function has to be called when a message is received for a certain person's chat.
         For example "Hello", 2 would add Hello to the chat of person 2.
      */
-    private void onMessageReceived(String message, int fromPerson) {
+    public void onMessageReceived(String message, int fromPerson) {
         ArrayList<String> chatLog = messageCollections.get(fromPerson);
         chatLog.add(message);
         fillChatDisplays(chatLog, fromPerson);

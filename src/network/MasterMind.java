@@ -50,7 +50,7 @@ public class MasterMind implements Runnable {
 
 
     public MasterMind(String name){
-        gui = new SceneSwitch(name);
+        gui = new SceneSwitch(name, this);
         ownName = name;
         seqNrs = new HashMap<>();
         keys = new Security();
@@ -170,6 +170,10 @@ public class MasterMind implements Runnable {
 
     public Receiver getReceiver() {
         return receiver;
+    }
+
+    public SceneSwitch getGui(){
+        return  gui;
     }
 
 
