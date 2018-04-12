@@ -130,6 +130,7 @@ public class Sender implements  Runnable{
     public void run() {
         while(mind.getStatus()){
             sendPulse();
+            mind.getReceiver().UpdateStatuses();
             try {
                 TimeUnit.SECONDS.sleep(1);
             } catch (InterruptedException e) {

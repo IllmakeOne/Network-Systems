@@ -105,36 +105,36 @@ public class SceneSwitch extends Application{
         initializeButtons();
         initializeLabels();
 
-        fillChatDisplays(messageCollections.get(1), 1);
-        onMessageReceived("1", 1);
+//        fillChatDisplays(messageCollections.get(1), 1);
+//        onMessageReceived("1", 1);
 
         // Set the beginning scene
         window.setScene(firstChatScene);
         window.setTitle("Best chatting application");
         window.show();
 
-        MasterMind node = new MasterMind(SOURCE, this);
-        this.masterMind = node;
-        Thread masternode = new Thread(node);
+
+        this.masterMind = new MasterMind(SOURCE, this);;
+        Thread masternode = new Thread(masterMind);
         masternode.start();
 
-        Thread t = new Thread() {
-            public void run() {
-                for (int i = 0; i < 5; i++) {
-                    try {
-                        Thread.sleep((long) (Math.random() * 1000));
-                    } catch (InterruptedException e) {
-                        e.printStackTrace();
-                    }
+//        Thread t = new Thread() {
+//            public void run() {
+//                for (int i = 0; i < 5; i++) {
+//                    try {
+//                        Thread.sleep((long) (Math.random() * 1000));
+//                    } catch (InterruptedException e) {
+//                        e.printStackTrace();
+//                    }
+//
+//                    onMessageReceived("NEW", 1);
+//                    onMessageReceived("NEWW", 2);
+//                }
+//            }
+//        };
 
-                    onMessageReceived("NEW", 1);
-                    onMessageReceived("NEWW", 2);
-                }
-            }
-        };
 
-
-        t.start();
+      //  t.start();
     }
 
 

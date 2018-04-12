@@ -20,7 +20,7 @@ public class MasterMind implements Runnable {
     public static final String MESSAGE = "m";
     public static final String PULSE = "p";
     public static final int TIMEOUTLIMIT = 1000;
-    public static final int OUTOFNETWORKTIMEOUT = 3000;
+    public static final int OUTOFNETWORKTIMEOUT = 5000;
 
     private boolean on;
 
@@ -103,7 +103,7 @@ public class MasterMind implements Runnable {
 //            if (!stringmess.substring(0,2).equals(sender.getMyPulse().substring(0,2)) &&
 //                    !currentMessage.equals(stringmess)) {
             if(!stringmess.substring(1,2).equals(ownName)){
-                System.out.println(stringmess);
+               // System.out.println(stringmess);
                 receiver.dealWithPacket(stringmess);
             }
         }
@@ -125,6 +125,8 @@ public class MasterMind implements Runnable {
      * the thread will end after the node receives and ack for that sent message
      */
     public void sendMessage(String message){
+
+
         if(receiver.getStatuses().keySet().contains(message.substring(0,1))){
             while (sender.getoutStanding().get(message.substring(0, 1))) {
                 try {
@@ -139,6 +141,7 @@ public class MasterMind implements Runnable {
             System.out.println("node nto online");
         }
 
+        //for all chat
         if(message.substring(0,1).equals("0")){
 
             new Thread(() -> sender.sendGlobalMessage(message)).start();

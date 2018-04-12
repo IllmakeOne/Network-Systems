@@ -22,7 +22,7 @@ public class Receiver {
 
     public void dealWithPacket(String message){
 
-        UpdateStatuses();
+
 
         if(message.substring(3,4).equals(mind.PULSE)){
             dealwithPulse(message);
@@ -58,9 +58,13 @@ public class Receiver {
      */
     public void dealwithPulse(String message){
         if(!statuses.keySet().contains(message.substring(0,1))){
+            System.out.println(" node was aded to peopel onlin" + message.substring(0,1));
             statuses.put(message.substring(0,1),System.currentTimeMillis());
             mind.getSeqNers().put(message.substring(0,1),"0");
         }
+        statuses.put(message.substring(0,1),System.currentTimeMillis());
+
+
     }
 
 
@@ -69,9 +73,11 @@ public class Receiver {
      * if it has not, it removes it from the list
      */
     public void UpdateStatuses(){
-        long now = System.currentTimeMillis();
+        long now;
         for(String key:statuses.keySet()){
+            now = System.currentTimeMillis();
             if(now - statuses.get(key) > mind.OUTOFNETWORKTIMEOUT){
+                System.out.println(key + " has gone ofline");
                 statuses.remove(key);
                 mind.getSeqNers().remove(key);
             }
