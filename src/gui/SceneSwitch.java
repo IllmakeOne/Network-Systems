@@ -1,6 +1,8 @@
 package gui;
 
 import javafx.application.Application;
+import javafx.beans.value.ChangeListener;
+import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
@@ -11,21 +13,24 @@ import javafx.scene.layout.VBox;
 import javafx.stage.Stage;
 import java.util.ArrayList;
 
+/*
+    GUI Class for the chatting application
+ */
 
 public class SceneSwitch extends Application {
-    private static final int HEIGHT = 680;
+    private static final int HEIGHT = 600;
     private static final int WIDTH = 400;
     private static final int PADDING = 10;
     private static final int INPUT_CHAT_HEIGHT = 50;
     private static final int NUM_OF_CHATS = 5;
+    private String SOURCE;
     private Stage window;
-
-    private ArrayList<String> messagesFirst, messagesSecond, messagesThird, messagesFourth, messagesGlobal;
 
     private Button[] goToButtons = new Button[NUM_OF_CHATS];
     private Button[] sendButtons = new Button[NUM_OF_CHATS];
     private TextArea[] chatAreas = new TextArea[NUM_OF_CHATS];
     private TextArea[] chatDisplays = new TextArea[NUM_OF_CHATS];
+    private ArrayList<ArrayList<String>> messageCollections = new ArrayList<>();
 
     private Scene firstChatScene, secondChatScene, thirdChatScene, fourthChatScene, globalChatScene;
     private Label[] chatLabels = new Label[NUM_OF_CHATS];
@@ -40,10 +45,20 @@ public class SceneSwitch extends Application {
         initializeButtons();
         window = primaryStage;
 
+        // Global chat window
+        VBox globalChatLayout = new VBox(PADDING);
+        globalChatLayout.getChildren().addAll(chatLabels[0], goToButtons[1], goToButtons[2],
+                goToButtons[3], goToButtons[4], new Label("Send a message"),  chatAreas[0], sendButtons[0], chatLogLabels[0], chatDisplays[0]);
+        globalChatScene = new Scene(globalChatLayout, WIDTH, HEIGHT);
+
+        // Refresh labels and buttons
+        initializeButtons();
+        initializeLabels();
+
         // First chat window
         VBox firstChatLayout = new VBox(PADDING);
-        firstChatLayout.getChildren().addAll(chatLabels[0], goToButtons[1], goToButtons[2],
-                goToButtons[3], goToButtons[4], new Label("Send a message"),  chatAreas[0], sendButtons[0], chatLogLabels[0], chatDisplays[0]);
+        firstChatLayout.getChildren().addAll(chatLabels[1], goToButtons[0], goToButtons[2],
+                goToButtons[3], goToButtons[4], new Label("Send a message"), chatAreas[1], sendButtons[1], chatLogLabels[1], chatDisplays[1]);
         firstChatScene = new Scene(firstChatLayout, WIDTH, HEIGHT);
 
         // Refresh labels and buttons
@@ -52,8 +67,8 @@ public class SceneSwitch extends Application {
 
         // Second chat window
         VBox secondChatLayout = new VBox(PADDING);
-        secondChatLayout.getChildren().addAll(chatLabels[1], goToButtons[0], goToButtons[2],
-                goToButtons[3], goToButtons[4], new Label("Send a message"), chatAreas[1], sendButtons[1], chatLogLabels[1], chatDisplays[1]);
+        secondChatLayout.getChildren().addAll(chatLabels[2], goToButtons[0], goToButtons[1],
+                goToButtons[3], goToButtons[4], new Label("Send a message"), chatAreas[2], sendButtons[2], chatLogLabels[2], chatDisplays[2]);
         secondChatScene = new Scene(secondChatLayout, WIDTH, HEIGHT);
 
         // Refresh labels and buttons
@@ -62,8 +77,9 @@ public class SceneSwitch extends Application {
 
         // Third chat window
         VBox thirdChatLayout = new VBox(PADDING);
-        thirdChatLayout.getChildren().addAll(chatLabels[2], goToButtons[0], goToButtons[1],
-                goToButtons[3], goToButtons[4], new Label("Send a message"), chatAreas[2], sendButtons[2], chatLogLabels[2], chatDisplays[2]);
+        thirdChatLayout.getChildren().addAll(chatLabels[3], goToButtons[0], goToButtons[1],
+                goToButtons[2], goToButtons[4], new Label("Send a message"), chatAreas[3],
+                sendButtons[3], chatLogLabels[3], chatDisplays[3]);
         thirdChatScene = new Scene(thirdChatLayout, WIDTH, HEIGHT);
 
         // Refresh labels and buttons
@@ -72,36 +88,59 @@ public class SceneSwitch extends Application {
 
         // Fourth chat window
         VBox fourthChatLayout = new VBox(PADDING);
-        fourthChatLayout.getChildren().addAll(chatLabels[3], goToButtons[0], goToButtons[1],
-                goToButtons[2], goToButtons[4], new Label("Send a message"), chatAreas[3], sendButtons[3], chatLogLabels[3], chatDisplays[3]);
+        fourthChatLayout.getChildren().addAll(chatLabels[4], goToButtons[1], goToButtons[2],
+                goToButtons[3], goToButtons[4], new Label("Send a message"), chatAreas[4],
+                sendButtons[4], chatLogLabels[4], chatDisplays[4]);
         fourthChatScene = new Scene(fourthChatLayout, WIDTH, HEIGHT);
 
         // Refresh labels and buttons
         initializeButtons();
         initializeLabels();
 
-        // Global chat window
-        VBox globalChatLayout = new VBox(PADDING);
-        globalChatLayout.getChildren().addAll(chatLabels[4], goToButtons[0], goToButtons[1],
-                goToButtons[2], goToButtons[3], new Label("Send a message"), chatAreas[4], sendButtons[4], chatLogLabels[4], chatDisplays[4]);
-        globalChatScene = new Scene(globalChatLayout, WIDTH, HEIGHT);
-
-        // Refresh labels and buttons
-        initializeButtons();
-        initializeLabels();
+        fillChatDisplays(messageCollections.get(1), 1);
+        onMessageReceived("1", 1);
 
         // Set the beginning scene
         window.setScene(firstChatScene);
         window.setTitle("Best chatting application");
         window.show();
+
+        Thread t = new Thread() {
+            public void run() {
+                for (int i = 0; i < 5; i++) {
+                    try {
+                        Thread.sleep((long) (Math.random() * 1000));
+                    } catch (InterruptedException e) {
+                        e.printStackTrace();
+                    }
+
+                    onMessageReceived("NEW", 1);
+                    onMessageReceived("NEWW", 2);
+                }
+            }
+        };
+        t.start();
     }
+
 
     /*
         Initializes the Chat Displays (which display the chat log).
      */
     private void initializeChatDisplay() {
         for (int i = 0; i < chatDisplays.length; i++) {
-            chatDisplays[i] = new TextArea();
+            TextArea temp  = new TextArea();
+            temp.setEditable(false);
+
+            // implements auto scroll to the bottom
+            temp.textProperty().addListener(new ChangeListener<Object>() {
+                @Override
+                public void changed(ObservableValue<?> observable, Object oldValue,
+                                    Object newValue) {
+                    temp.setScrollTop(Double.MAX_VALUE);
+                }
+            });
+
+            chatDisplays[i] = temp;
         }
     }
 
@@ -109,13 +148,13 @@ public class SceneSwitch extends Application {
         Initializes ArrayList<Strings> for keeping track of the messages that have been sent.
     */
     private void initializeMessages() {
-        messagesFirst = new ArrayList<>();
-        messagesFirst.add("test");
-        messagesFirst.add("this is a nice conversation");
-        messagesSecond = new ArrayList<>();
-        messagesThird = new ArrayList<>();
-        messagesFourth = new ArrayList<>();
-        messagesGlobal = new ArrayList<>();
+        for (int i = 0; i < 5; i++) {
+            messageCollections.add(new ArrayList<>());
+        }
+
+        messageCollections.get(1).add("test");
+        messageCollections.get(1).add("this is a nice conversation");
+        messageCollections.get(1).add("aaa");
     }
 
     /*
@@ -134,11 +173,11 @@ public class SceneSwitch extends Application {
     */
     private void initializeLabels() {
         for (int i = 0; i < chatLabels.length; i++) {
-            chatLabels[i] = new Label("You are chatting with person " + (i + 1));
-            chatLogLabels[i] = new Label("Chat log with person " + (i + 1));
+            chatLabels[i] = new Label("You are chatting with person " + i);
+            chatLogLabels[i] = new Label("Chat log with person " + i);
         }
-        chatLabels[4].setText("Global Chat");
-        chatLabels[4].setText("Chat log on Global Chat");
+        chatLabels[0].setText("Global Chat");
+        chatLabels[0].setText("Chat log on Global Chat");
     }
 
     /*
@@ -146,19 +185,20 @@ public class SceneSwitch extends Application {
     */
     private void initializeButtons() {
         for (int i = 0; i < goToButtons.length; i++) {
-            goToButtons[i] = new Button("Go to chat " + (i + 1));
+            goToButtons[i] = new Button("Go to chat " + i);
 
             Button sendTemp = new Button("Send");
+            sendTemp.setId(i + "");
             sendTemp.setOnAction(buttonHandler);
             sendButtons[i] = sendTemp;
         }
 
-        goToButtons[0].setOnAction(event -> window.setScene(firstChatScene));
-        goToButtons[1].setOnAction(event -> window.setScene(secondChatScene));
-        goToButtons[2].setOnAction(event -> window.setScene(thirdChatScene));
-        goToButtons[3].setOnAction(event -> window.setScene(fourthChatScene));
-        goToButtons[4].setOnAction(event -> window.setScene(globalChatScene));
-        goToButtons[4].setText("Go to global chat");
+        goToButtons[0].setOnAction(event -> window.setScene(globalChatScene));
+        goToButtons[0].setText("Go to global chat");
+        goToButtons[1].setOnAction(event -> window.setScene(firstChatScene));
+        goToButtons[2].setOnAction(event -> window.setScene(secondChatScene));
+        goToButtons[3].setOnAction(event -> window.setScene(thirdChatScene));
+        goToButtons[4].setOnAction(event -> window.setScene(fourthChatScene));
     }
 
     /*
@@ -166,14 +206,13 @@ public class SceneSwitch extends Application {
         TextArea is used here.
      */
     private EventHandler<ActionEvent> buttonHandler = event -> {
-        for (int i = 0; i < chatAreas.length; i++) {
-            System.out.println(event.getSource());
+        int windowId = Integer.valueOf(((Button) event.getSource()).getId());
+        System.out.println("SEND TO " + windowId + " FROM " + SOURCE);
 
-            System.out.println(chatAreas[i].getText());
+        String text = chatAreas[windowId].getText();
+        onMessageReceived(text, windowId);
 
-
-            chatAreas[i].setText("");
-        }
+        chatAreas[windowId].setText("");
         event.consume();
     };
 
@@ -185,9 +224,31 @@ public class SceneSwitch extends Application {
     }
 
     /*
-        Fills the chat logg with the messages that were sent
+        Constructor
      */
-    public void fillChatDisplays(ArrayList<String> messages, int chat) {
 
+    public SceneSwitch(String source) {
+        SOURCE = source;
+    }
+
+    /*
+        Fills the chat log with the messages that were sent
+     */
+    private void fillChatDisplays(ArrayList<String> messages, int chat) {
+        chatDisplays[chat].setText("");
+        for (String s : messages) {
+            chatDisplays[chat].setText(chatDisplays[chat].getText() + "- " + s + "\n\n");
+        }
+        chatDisplays[chat].appendText("");
+    }
+
+    /*
+        This function has to be called when a message is received for a certain person's chat.
+        For example "Hello", 2 would add Hello to the chat of person 2.
+     */
+    private void onMessageReceived(String message, int fromPerson) {
+        ArrayList<String> chatLog = messageCollections.get(fromPerson);
+        chatLog.add(message);
+        fillChatDisplays(chatLog, fromPerson);
     }
 }
