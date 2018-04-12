@@ -1,6 +1,7 @@
 package network;
 
 import java.net.MulticastSocket;
+import java.util.ArrayList;
 import java.util.HashMap;
 
 public class Receiver {
@@ -8,6 +9,8 @@ public class Receiver {
 
     private MulticastSocket sock;
     private  MasterMind mind;
+
+    private HashMap<String, String> recentMessage;
 
     //this keeps in mind each time it receives a pulse from a node so it knows it's in the network
     private HashMap<String, Long> statuses;
@@ -18,6 +21,7 @@ public class Receiver {
         this.sock = socket;
         this.mind = mind;
         statuses = new HashMap<String, Long>();
+        recentMessage = new HashMap<>();
     }
 
     public void dealWithPacket(String message){
@@ -37,18 +41,6 @@ public class Receiver {
         }
 
         forwardPack(message);
-//        if(message.substring(3,4).equals(mind.ACK)){
-//
-//            dealtwithAck(message);
-//        } else if(message.substring(3,4).equals(mind.PULSE)){
-//            dealwithPulse(message);
-//
-//        } else if (message.substring(3,4).equals(mind.MESSAGE)){
-//
-//            dealwithMessage(message);
-//        } else {
-//            System.out.println("Unrecognised message");
-//        }
     }
 
 
@@ -58,7 +50,7 @@ public class Receiver {
      */
     public void dealwithPulse(String message){
         if(!statuses.keySet().contains(message.substring(0,1))){
-            System.out.println(" node was aded to peopel onlin" + message.substring(0,1));
+            System.out.println(message.substring(0,1) + "has come online");
             statuses.put(message.substring(0,1),System.currentTimeMillis());
             mind.getSeqNers().put(message.substring(0,1),"0");
             mind.getSender().getoutStanding().put(message.substring(0,1),false);
@@ -73,7 +65,7 @@ public class Receiver {
      * this function checks if it has received in the last 3 second a pulse from the nodes conected
      * if it has not, it removes it from the list
      */
-    public void UpdateStatuses(){
+    public synchronized void UpdateStatuses(){
         long now;
         for(String key:statuses.keySet()){
             now = System.currentTimeMillis();
@@ -91,17 +83,26 @@ public class Receiver {
 
 
     public void dealtwithAck(String message){
+
         String source = message.substring(0,1);
         String seq = message.substring(4,5);
+
         if(seq.equals(mind.getSeqNers().get(source))){
             mind.getSender().receivedAck(source);
+        }
+
+        if(mind.getSeqNers().get(source).equals("9")){
+            mind.getSeqNers().put(source,"0");
+        } else {
+            mind.getSeqNers().put(source,
+                    String.valueOf(Integer.valueOf(mind.getSeqNers().get(source)) -1));
         }
 
     }
 
     public void dealwithMessage(String message){
        String mess = mind.getSecurity().decrypt(message.substring(5), message.substring(0,1));
-
+        //arecentMessage.put(message.substring(1,2), message.g)
 
        if(message.substring(0,1).equals("0")){
            mind.getGui().onMessageReceived(mess, Integer.valueOf("0"));

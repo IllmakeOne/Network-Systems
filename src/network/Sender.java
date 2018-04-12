@@ -29,7 +29,7 @@ public class Sender implements  Runnable{
 
         mypulse = mind.getOwnName() //the name
                 + mind.getOwnName() // it is double so the protocol is respected
-                + "3" // time to live
+                + "2" // time to live
                 + mind.PULSE; // type of message
 
     }
@@ -52,7 +52,7 @@ public class Sender implements  Runnable{
         String detination = mtbs.substring(0,1);
         String mesg = detination //destination
                 + mind.getOwnName() // source
-                + "3" // time to live
+                + "2" // time to live
                 + mind.MESSAGE // type of message
                 + mind.getSeqNers().get(mtbs.substring(0, 1)) // seq number
                 + mind.getSecurity().encrypt(detination,mtbs.substring(1)); // encoded message
@@ -76,11 +76,11 @@ public class Sender implements  Runnable{
         }
 
         //change the sequance number asociated to a node
-        if(mind.getSeqNers().get(detination).equals("0")){
-            mind.getSeqNers().put(detination,"1");
-        } else {
+        if(mind.getSeqNers().get(detination).equals("9")){
             mind.getSeqNers().put(detination,"0");
-
+        } else {
+            mind.getSeqNers().put(detination,
+                    String.valueOf(Integer.valueOf(mind.getSeqNers().get(detination)) -1));
         }
 
     }
@@ -99,7 +99,7 @@ public class Sender implements  Runnable{
     public void sendAck(String destination, String seqaceNr){
         String ack = destination
                     + mind.getOwnName()
-                    + "3"
+                    + "2"
                     + mind.ACK
                     + seqaceNr;
 

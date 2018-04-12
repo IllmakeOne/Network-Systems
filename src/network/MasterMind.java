@@ -105,6 +105,7 @@ public class MasterMind implements Runnable {
 //                    !currentMessage.equals(stringmess)) {
             if(!stringmess.substring(1,2).equals(ownName)){
                // System.out.println(stringmess);
+              //  if(seqNrs.get(recv.equals()))
                 receiver.dealWithPacket(stringmess);
             }
         }
