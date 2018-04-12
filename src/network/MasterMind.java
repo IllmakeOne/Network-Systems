@@ -20,7 +20,7 @@ public class MasterMind implements Runnable {
     public static final String MESSAGE = "m";
     public static final String PULSE = "p";
     public static final int TIMEOUTLIMIT = 1000;
-    public static final int OUTOFNETWORKTIMEOUT = 3000;
+    public static final int OUTOFNETWORKTIMEOUT = 5000;
 
     private boolean on;
 
@@ -93,15 +93,19 @@ public class MasterMind implements Runnable {
 
             String stringmess = datagrampacketTostring(recv);
 
-          //  receiver.dealwithMessage(stringmess);
-            if(!stringmess.substring(1,2).equals(ownName)){
-               // System.out.println(stringmess);
-                if(!seqNrs.keySet().contains(stringmess.substring(1,2))){
-                    receiver.dealWithPacket(stringmess);
-                } else if(seqNrs.get(stringmess.substring(1,2)).equals(stringmess.substring(4,5))) {
-                    receiver.dealWithPacket(stringmess);
-                }
-            }
+            receiver.dealWithPacket(stringmess);
+//            if(!stringmess.substring(1,2).equals(ownName)) {
+//                // System.out.println(stringmess);
+//                if (!seqNrs.keySet().contains(stringmess.substring(1, 2))) {
+//                    receiver.dealWithPacket(stringmess);
+//                } else if (seqNrs.get(stringmess.substring(1, 2)).equals(stringmess.substring(4, 5))) {
+//                    receiver.dealWithPacket(stringmess);
+//                } else if (stringmess.substring(3, 4).equals(PULSE)) {
+//                    receiver.dealwithMessage(stringmess);
+//                    //receiver.dealwithMessage(stringmess);
+//                }
+//            }
+
         }
     }
 

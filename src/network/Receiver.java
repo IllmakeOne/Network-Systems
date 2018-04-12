@@ -28,20 +28,38 @@ public class Receiver {
     public void dealWithPacket(String message){
 
 
+        String destination = message.substring(0,1);
+        String type = message.substring(3,4);
+        String source = message.substring(1,2);
+        String seq = message.substring(4,5);
 
-        if(message.substring(3,4).equals(mind.PULSE)){
-            dealwithPulse(message);
-        } else if(message.substring(0,1).equals(mind.getOwnName())){
-            System.out.println(message);
-            if(message.substring(3,4).equals(mind.ACK)){
+        if(!source.equals(mind.getOwnName())) {
 
-                dealtwithAck(message);
-            } else {
-                dealwithMessage(message);
+            if (type.equals(mind.PULSE)) {
+                dealwithPulse(message);
+            } else if(destination.equals(mind.getOwnName()) &&
+                        seq.equals(mind.getSeqNers().get(destination))){
+                if(type.equals(mind.ACK)){
+                    dealtwithAck(message);
+                } else {
+                    dealwithMessage(message);
+                }
+
             }
-        }
+//        if(message.substring(3,4).equals(mind.PULSE)){
+//            dealwithPulse(message);
+//        } else if(message.substring(0,1).equals(mind.getOwnName())){
+//            System.out.println(message);
+//            if(message.substring(3,4).equals(mind.ACK)){
+//
+//                dealtwithAck(message);
+//            } else {
+//                dealwithMessage(message);
+//            }
+//        }
 
-        forwardPack(message);
+            forwardPack(message);
+        }
     }
 
 
@@ -51,6 +69,8 @@ public class Receiver {
      * @param message
      */
     public void dealwithPulse(String message){
+
+
         if(!statuses.keySet().contains(message.substring(0,1))){
 
             System.out.println(message.substring(0,1) + " has come online");
@@ -59,6 +79,8 @@ public class Receiver {
             mind.getSeqNers().put(message.substring(0,1),"0");
             mind.getSender().getoutStanding().put(message.substring(0,1),false);
         }
+
+        //System.out.println("updated time for "+ message.substring(0,1));
         statuses.put(message.substring(0,1),System.currentTimeMillis());
 
 
@@ -74,7 +96,7 @@ public class Receiver {
         for(String key:statuses.keySet()){
             now = System.currentTimeMillis();
             if(now - statuses.get(key) > mind.OUTOFNETWORKTIMEOUT){
-                System.out.println(key + " has gone ofline");
+                System.out.println(key + " has gone offline");
                 statuses.remove(key);
                 mind.getSeqNers().remove(key);
             }
@@ -106,13 +128,13 @@ public class Receiver {
 
     public void dealwithMessage(String message){
        String mess = mind.getSecurity().decrypt(message.substring(5), message.substring(0,1));
+       String destination = message.substring(0,1);
         //arecentMessage.put(message.substring(1,2), message.g)
 
-       if(message.substring(0,1).equals("0")){
+       if(destination.equals("0")){
            mind.getGui().onMessageReceived(mess, Integer.valueOf("0"));
        } else {
 
-           // ADD FOR GROUP CHAT
 
            //send to upper layer
          //  System.out.println(mess + " " +Integer.valueOf(message.substring(1, 2)));
@@ -152,3 +174,36 @@ public class Receiver {
 //        }
 //    }
 }
+
+
+
+
+
+
+
+
+
+
+
+//
+//    public void dealWithPacket(String message){
+//
+//        if(!message.substring(1,2).equals(mind.getOwnName())) {
+//
+//            if (message.substring(3, 4).equals(mind.PULSE)) {
+//                dealwithPulse(message);
+//
+//            } else if (message.substring(0, 1).equals(mind.getOwnName()) &&
+//                    mind.getSeqNers().get(message.substring(1,2)).equals(message.substring(4,5))) {
+//                System.out.println(message);
+//                if (message.substring(3, 4).equals(mind.ACK)) {
+//
+//                    dealtwithAck(message);
+//                } else {
+//                    dealwithMessage(message);
+//                }
+//            }
+//
+//            forwardPack(message);
+//        }
+//    }
