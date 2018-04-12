@@ -1,5 +1,6 @@
 package network;
 
+import gui.SceneSwitch;
 import security.Security;
 
 import java.io.IOException;
@@ -27,8 +28,12 @@ public class MasterMind implements Runnable {
     //own name
     private String ownName;
 
+    private SceneSwitch gui;
+
+    public String currentMessage = "";
+
     //list to keep track of sequance numbers with other nodes
-    private HashMap<String, Integer> seqNrs;
+    private HashMap<String, String> seqNrs;
 
     //the socket used for receding and sending packages
     private MulticastSocket sock;
@@ -45,6 +50,7 @@ public class MasterMind implements Runnable {
 
 
     public MasterMind(String name){
+        gui = new SceneSwitch(name);
         ownName = name;
         seqNrs = new HashMap<>();
         keys = new Security();
@@ -63,12 +69,17 @@ public class MasterMind implements Runnable {
     @Override
     public void run() {
 
+        int run = 0;
         //start a new thread which will pulse each second
         Thread pulsing = new Thread(sender);
         pulsing.start();
 
         //while is on, keeping looking for packs to receive
         while(on){
+            run++;
+            if(run == 10){
+                this.sendMessage("1boi");
+            }
             byte[] buf = new byte[1000];
             DatagramPacket recv = new DatagramPacket(buf, buf.length);
 
@@ -80,9 +91,11 @@ public class MasterMind implements Runnable {
 
             String stringmess = datagrampacketTostring(recv);
             //if its a pulse from itself , just ignore it
-            if (!stringmess.substring(0,4).equals(sender.getMyPulse())) {
-                receiver.dealWithMessage(stringmess);
-        }
+//            if (!stringmess.substring(0,2).equals(sender.getMyPulse().substring(0,2)) &&
+//                    !currentMessage.equals(stringmess)) {
+            if(!stringmess.substring(1,2).equals(ownName)){
+                receiver.dealWithPacket(stringmess);
+            }
         }
     }
 
@@ -103,7 +116,7 @@ public class MasterMind implements Runnable {
      */
     public void sendMessage(String message){
 
-        while(sender.getoutStanding().get(message.substring(0,1)) == true){
+        while(sender.getoutStanding().get(message.substring(0,1))){
             try {
                 TimeUnit.MILLISECONDS.sleep(10);
             } catch (InterruptedException e) {
@@ -115,11 +128,15 @@ public class MasterMind implements Runnable {
 
     }
 
+    public void updateCurretnMessage(String msg){
+        this.currentMessage = msg;
+    }
+
     public void turnOff(){
         this.on = false;
     }
 
-    public HashMap<String, Integer> getSeqNers(){
+    public HashMap<String, String> getSeqNers(){
         return seqNrs;
     }
 

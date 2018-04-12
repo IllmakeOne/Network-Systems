@@ -12,6 +12,7 @@ public class Sender implements  Runnable{
     private MasterMind mind;
     // map of the nodes still waiting for a reply
     private HashMap<String, Boolean> outStanding;
+
     private String mypulse = "";
 
     //map of timeouts
@@ -23,7 +24,9 @@ public class Sender implements  Runnable{
         this.mind = mind;
 
         outStanding = new HashMap<String, Boolean>();
-        timeouts = new HashMap<String, Long>();
+        timeouts = new HashMap<>();
+        outStanding.put("1",false);
+      //  timeouts = new HashMap<String, Long>();
 
         mypulse = mind.getOwnName() //the name
                 + mind.getOwnName() // it is double so the protocol is respected
@@ -55,14 +58,8 @@ public class Sender implements  Runnable{
                 + mind.getSeqNers().get(mtbs.substring(0, 1)) // seq number
                 + mind.getSecurity().encrypt(detination,mtbs.substring(1)); // encoded message
 
-        //change the sequance number asociated to a node
-        if(mind.getSeqNers().get(detination) == 0){
-            mind.getSeqNers().put(detination,1);
-        } else {
-            mind.getSeqNers().put(detination,0);
 
-        }
-
+        mind.updateCurretnMessage(mesg);
         send(mesg);
 
         outStanding.put(mesg.substring(0,1),true);//note down its waiting for an ack
@@ -70,9 +67,21 @@ public class Sender implements  Runnable{
 
         while(outStanding.get(detination) == true){
             if (System.currentTimeMillis() - timeouts.get(detination) > mind.TIMEOUTLIMIT){
+
                 timeouts.put(detination, System.currentTimeMillis());
+
                 send(mesg);
+
+                mind.updateCurretnMessage(mesg);
             }
+        }
+
+        //change the sequance number asociated to a node
+        if(mind.getSeqNers().get(detination).equals("0")){
+            mind.getSeqNers().put(detination,"1");
+        } else {
+            mind.getSeqNers().put(detination,"0");
+
         }
 
     }
@@ -84,11 +93,12 @@ public class Sender implements  Runnable{
      * @param destination of the ack
      * @param seqaceNr the seq nr it is acknowledging
      */
-    public void sendAck(String destination, int seqaceNr){
+    public void sendAck(String destination, String seqaceNr){
         String ack = destination
                     + mind.getOwnName()
                     + "3"
-                    + mind.ACK;
+                    + mind.ACK
+                    + seqaceNr;
 
         send(ack);
     }

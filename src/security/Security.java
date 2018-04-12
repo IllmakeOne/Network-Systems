@@ -11,7 +11,7 @@ public class Security {
         return  "test";
     }
 
-    public static String decrypt(String strEncrypted,String strKey) throws Exception {
+    public static String decrypt(String strEncrypted,String strKey) {
         return "test";
     }
 /**public static String encrypt(String strClearText,String strKey) throws Exception{
