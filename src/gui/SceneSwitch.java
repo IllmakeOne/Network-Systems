@@ -229,14 +229,10 @@ public class SceneSwitch extends Application {
         Run the program.
      */
     public static void main(String[] args) {
-        launch(args);
+        Application.launch(SceneSwitch.class, args);
     }
 
-    /*
-        Constructor
-     */
-
-    public SceneSwitch(String source, MasterMind masterMind) {
+    public void initialize(String source, MasterMind masterMind) {
         SOURCE = source;
         this.masterMind = masterMind;
     }
