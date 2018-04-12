@@ -86,6 +86,10 @@ public class Sender implements  Runnable{
 
     }
 
+    public void sendGlobalMessage(String message){
+
+    }
+
 
 
     /**

@@ -1,6 +1,8 @@
 package network;
 
+import com.sun.xml.internal.fastinfoset.util.StringArray;
 import gui.SceneSwitch;
+import javafx.application.Application;
 import security.Security;
 
 import java.io.IOException;
@@ -49,9 +51,12 @@ public class MasterMind implements Runnable {
     private Security keys;
 
 
-    public MasterMind(String name){
-        gui = new SceneSwitch(name, this);
+    public MasterMind(String name, SceneSwitch gui){
+
+
         ownName = name;
+
+
         seqNrs = new HashMap<>();
         keys = new Security();
         on = true;
@@ -68,18 +73,22 @@ public class MasterMind implements Runnable {
 
     @Override
     public void run() {
+//        gui.initialize(this.ownName, this);
+//        //Application.launch(SceneSwitch.class, new String[]{});
+//        Thread guiThread = new Thread(gui);
+//        guiThread.start();
+//        //gui.launch( new String[]{});
 
-        int run = 0;
+
+
+
         //start a new thread which will pulse each second
         Thread pulsing = new Thread(sender);
         pulsing.start();
 
         //while is on, keeping looking for packs to receive
         while(on){
-            run++;
-            if(run == 10){
-                this.sendMessage("1boi");
-            }
+//
             byte[] buf = new byte[1000];
             DatagramPacket recv = new DatagramPacket(buf, buf.length);
 
@@ -94,6 +103,7 @@ public class MasterMind implements Runnable {
 //            if (!stringmess.substring(0,2).equals(sender.getMyPulse().substring(0,2)) &&
 //                    !currentMessage.equals(stringmess)) {
             if(!stringmess.substring(1,2).equals(ownName)){
+                System.out.println(stringmess);
                 receiver.dealWithPacket(stringmess);
             }
         }
@@ -115,16 +125,24 @@ public class MasterMind implements Runnable {
      * the thread will end after the node receives and ack for that sent message
      */
     public void sendMessage(String message){
-
-        while(sender.getoutStanding().get(message.substring(0,1))){
-            try {
-                TimeUnit.MILLISECONDS.sleep(10);
-            } catch (InterruptedException e) {
-                System.err.println("could not wait int Mastermind SendMessage,for some reason");
+        if(receiver.getStatuses().keySet().contains(message.substring(0,1))){
+            while (sender.getoutStanding().get(message.substring(0, 1))) {
+                try {
+                    TimeUnit.MILLISECONDS.sleep(10);
+                } catch (InterruptedException e) {
+                    System.err.println("could not wait int Mastermind SendMessage,for some reason");
+                }
             }
+
+            new Thread(() -> sender.sendMessage(message)).start();
+        } else {
+            System.out.println("node nto online");
         }
 
-        new Thread(() -> sender.sendMessage(message)).start();
+        if(message.substring(0,1).equals("0")){
+
+            new Thread(() -> sender.sendGlobalMessage(message)).start();
+        }
 
     }
 

@@ -19,7 +19,7 @@ import java.util.ArrayList;
     GUI Class for the chatting application
  */
 
-public class SceneSwitch extends Application {
+public class SceneSwitch extends Application{
     private static final int HEIGHT = 600;
     private static final int WIDTH = 400;
     private static final int PADDING = 10;
@@ -41,6 +41,11 @@ public class SceneSwitch extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
+
+        SOURCE = getParameters().getUnnamed().get(0);
+
+
+        System.out.println(getParameters());
         initializeLabels();
         initializeChatAreas();
         initializeMessages();
@@ -108,6 +113,11 @@ public class SceneSwitch extends Application {
         window.setTitle("Best chatting application");
         window.show();
 
+        MasterMind node = new MasterMind(SOURCE, this);
+        this.masterMind = node;
+        Thread masternode = new Thread(node);
+        masternode.start();
+
         Thread t = new Thread() {
             public void run() {
                 for (int i = 0; i < 5; i++) {
@@ -122,6 +132,8 @@ public class SceneSwitch extends Application {
                 }
             }
         };
+
+
         t.start();
     }
 
@@ -216,6 +228,8 @@ public class SceneSwitch extends Application {
         System.out.println(text);
 
         String outMessage = String.valueOf(windowId) + text;
+        System.out.println(outMessage);
+
         masterMind.sendMessage(outMessage);
 
         // add it to chat log
@@ -229,13 +243,18 @@ public class SceneSwitch extends Application {
         Run the program.
      */
     public static void main(String[] args) {
-        Application.launch(SceneSwitch.class, args);
+        //Application.launch(SceneSwitch.class, new String[]{});
+        launch(args);
+
     }
 
-    public void initialize(String source, MasterMind masterMind) {
-        SOURCE = source;
-        this.masterMind = masterMind;
-    }
+//    public void initialize(String source) {
+//        SOURCE = source;
+//    }
+//
+//    public void initializeMind(MasterMind masterMind){
+//        this.masterMind = masterMind;
+//    }
 
     /*
         Fills the chat log with the messages that were sent

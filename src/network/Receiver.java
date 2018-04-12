@@ -78,6 +78,10 @@ public class Receiver {
         }
     }
 
+    public HashMap<String, Long> getStatuses(){
+        return statuses;
+    }
+
 
     public void dealtwithAck(String message){
         String source = message.substring(0,1);
@@ -92,10 +96,14 @@ public class Receiver {
        String mess = mind.getSecurity().decrypt(message.substring(5), message.substring(0,1));
 
 
-       // ADD FOR GROUP CHAT
-        //send to upper layer
-        mind.getGui().onMessageReceived(mess, Integer.valueOf(message.substring(1,2)));
+       if(message.substring(0,1).equals("0")){
+           mind.getGui().onMessageReceived(mess, Integer.valueOf("0"));
+       } else {
 
+           // ADD FOR GROUP CHAT
+           //send to upper layer
+           mind.getGui().onMessageReceived(mess, Integer.valueOf(message.substring(1, 2)));
+       }
 
         // send ack package back to sender
         mind.getSender().sendAck(message.substring(1,2), message.substring(4,5));
