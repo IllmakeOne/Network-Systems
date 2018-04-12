@@ -74,14 +74,6 @@ public class MasterMind implements Runnable {
 
     @Override
     public void run() {
-//        gui.initialize(this.ownName, this);
-//        //Application.launch(SceneSwitch.class, new String[]{});
-//        Thread guiThread = new Thread(gui);
-//        guiThread.start();
-//        //gui.launch( new String[]{});
-
-
-
 
         //start a new thread which will pulse each second
         Thread pulsing = new Thread(sender);
@@ -90,7 +82,7 @@ public class MasterMind implements Runnable {
         //while is on, keeping looking for packs to receive
         while(on){
 //
-            byte[] buf = new byte[1000];
+            byte[] buf = new byte[500];
             DatagramPacket recv = new DatagramPacket(buf, buf.length);
 
             try {
@@ -100,13 +92,12 @@ public class MasterMind implements Runnable {
             }
 
             String stringmess = datagrampacketTostring(recv);
-            //if its a pulse from itself , just ignore it
-//            if (!stringmess.substring(0,2).equals(sender.getMyPulse().substring(0,2)) &&
-//                    !currentMessage.equals(stringmess)) {
+
             if(!stringmess.substring(1,2).equals(ownName)){
                // System.out.println(stringmess);
-              //  if(seqNrs.get(recv.equals()))
-                receiver.dealWithPacket(stringmess);
+                if(seqNrs.get(stringmess.substring(1,2)).equals(stringmess.substring(4,5))) {
+                    receiver.dealWithPacket(stringmess);
+                }
             }
         }
     }
@@ -129,6 +120,7 @@ public class MasterMind implements Runnable {
     public void sendMessage(String message){
 
         System.out.println(message + " In send msessage MAstermind");
+
         if(receiver.getStatuses().keySet().contains(message.substring(0,1))){
             while (sender.getoutStanding().get(message.substring(0, 1))) {
                 try {
@@ -140,7 +132,7 @@ public class MasterMind implements Runnable {
 
             new Thread(() -> sender.sendMessage(message)).start();
         } else {
-            System.out.println("node nto online");
+            System.out.println("node not online");
         }
 
         //for all chat

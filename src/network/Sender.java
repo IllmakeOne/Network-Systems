@@ -54,9 +54,10 @@ public class Sender implements  Runnable{
                 + mind.getOwnName() // source
                 + "2" // time to live
                 + mind.MESSAGE // type of message
-                + mind.getSeqNers().get(mtbs.substring(0, 1)) // seq number
-                + mind.getSecurity().encrypt(detination,mtbs.substring(1)); // encoded message
+                + mind.getSeqNers().get(detination) // seq number
+                + mind.getSecurity().encrypt(mtbs.substring(1),detination); // encoded message
 
+        System.out.println(mesg + " made in sendMessage in Sender");
 
         mind.updateCurretnMessage(mesg);
         send(mesg);
