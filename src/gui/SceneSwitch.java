@@ -38,6 +38,8 @@ public class SceneSwitch extends Application{
     private Label[] chatLabels = new Label[NUM_OF_CHATS];
     private Label[] chatLogLabels = new Label[NUM_OF_CHATS];
 
+    public static final String OFFLINE = "Not online";
+
     @Override
     public void start(Stage primaryStage) throws Exception {
         SOURCE = getParameters().getUnnamed().get(0);
@@ -195,18 +197,23 @@ public class SceneSwitch extends Application{
      */
     private EventHandler<ActionEvent> buttonHandler = event -> {
         int windowId = Integer.valueOf(((Button) event.getSource()).getId());
-       // System.out.println("SEND TO " + windowId + " FROM " + SOURCE);
-
+        System.out.println("SEND TO " + windowId + " FROM " + SOURCE);
         String text = chatAreas[windowId].getText();
-       // System.out.println(text);
+
+        // if text is empty don't send.
+        if (text.isEmpty()) {
+            return;
+        }
+
+        System.out.println(text);
 
         String outMessage = String.valueOf(windowId) + text;
-       // System.out.println(outMessage);
+        System.out.println(outMessage);
 
         masterMind.sendMessage(outMessage);
 
         // add it to chat log
-        onMessageReceived(text, windowId);
+        addOwnMessageToChat(text, windowId);
 
         chatAreas[windowId].setText("");
         event.consume();
@@ -227,7 +234,7 @@ public class SceneSwitch extends Application{
     private void fillChatDisplays(ArrayList<String> messages, int chat) {
         chatDisplays[chat].setText("");
         for (String s : messages) {
-            chatDisplays[chat].setText(chatDisplays[chat].getText() + "- " + s + "\n\n");
+            chatDisplays[chat].setText(chatDisplays[chat].getText() + " - " + s + "\n\n");
         }
         chatDisplays[chat].appendText("");
     }
@@ -236,9 +243,19 @@ public class SceneSwitch extends Application{
         This function has to be called when a message is received for a certain person's chat.
         For example "Hello", 2 would add Hello to the chat of person 2.
      */
-    public void onMessageReceived(String message, int fromPerson) {
-        ArrayList<String> chatLog = messageCollections.get(fromPerson);
-        chatLog.add(message);
-        fillChatDisplays(chatLog, fromPerson);
+    public void onMessageReceived(String message, int window) {
+        ArrayList<String> chatLog = messageCollections.get(window);
+        if (message.equals(OFFLINE)) {
+            chatLog.add(OFFLINE);
+        } else {
+            chatLog.add(window + ": " + message);
+        }
+        fillChatDisplays(chatLog, window);
+    }
+
+    public void addOwnMessageToChat(String message, int window) {
+        ArrayList<String> chatLog = messageCollections.get(window);
+        chatLog.add("ME: " + message);
+        fillChatDisplays(chatLog, window);
     }
 }
