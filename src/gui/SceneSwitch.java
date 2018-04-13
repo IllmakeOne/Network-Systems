@@ -197,7 +197,7 @@ public class SceneSwitch extends Application{
      */
     private EventHandler<ActionEvent> buttonHandler = event -> {
         int windowId = Integer.valueOf(((Button) event.getSource()).getId());
-        System.out.println("SEND TO " + windowId + " FROM " + SOURCE);
+        //System.out.println("SEND TO " + windowId + " FROM " + SOURCE);
         String text = chatAreas[windowId].getText();
 
         // if text is empty don't send.
@@ -205,10 +205,10 @@ public class SceneSwitch extends Application{
             return;
         }
 
-        System.out.println(text);
+        //System.out.println(text);
 
         String outMessage = String.valueOf(windowId) + text;
-        System.out.println(outMessage);
+        //System.out.println(outMessage);
 
         masterMind.sendMessage(outMessage);
 
