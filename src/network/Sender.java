@@ -98,8 +98,10 @@ public class Sender implements  Runnable{
      */
     public void sendGlobalMessage(String message){
         String mesg = "0" + mind.getOwnName() + "2" +
-                    mind.MESSAGE + "0" + message.substring(1);
+                    mind.MESSAGE + mind.getSeqNers().get("0") + message.substring(1);
+        mind.updateSeq("0");
         send(mesg);
+       // System.out.println(mind.getSeqNers().get("0") +  "message sent");
     }
 
 

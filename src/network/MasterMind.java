@@ -160,7 +160,7 @@ public class MasterMind implements Runnable {
 
         //for all chat
         if(message.substring(0,1).equals("0")){
-
+           // System.out.println(getSeqNers().get("0") + " Trying to send message in mastermind " );
             new Thread(() -> sender.sendGlobalMessage(message)).start();
         }
 

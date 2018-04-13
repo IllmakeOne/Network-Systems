@@ -50,8 +50,11 @@ public class Receiver {
                            }
                        }
 
-            } else if(destination.equals("0") && seq.equals(mind.getSeqNers().get("0"))){
-                delawithGlobalMessage(message.substring(5),source);
+            } else if(destination.equals("0")){
+               // System.out.println(message);
+                if (seq.equals(mind.getSeqNers().get("0"))) {
+                    delawithGlobalMessage(message.substring(5), source);
+                }
             }
 
 //        if(message.substring(3,4).equals(mind.PULSE)){
@@ -95,8 +98,10 @@ public class Receiver {
     }
 
     public void delawithGlobalMessage(String message,String fromWho){
+        //System.out.println(mind.getSeqNers().get("0") + " seq at deal with global message");
         mind.getGui().onGlobalMessageReceived(message, Integer.valueOf(fromWho));
         mind.updateSeq("0");
+        //System.out.println(mind.getSeqNers().get("0") + " after it made it bigger ");
     }
 
 
