@@ -18,7 +18,7 @@ import java.util.ArrayList;
     GUI Class for the chatting application
  */
 
-public class SceneSwitch extends Application{
+public class SceneSwitch extends Application {
     private static final int HEIGHT = 600;
     private static final int WIDTH = 400;
     private static final int PADDING = 10;
@@ -93,8 +93,8 @@ public class SceneSwitch extends Application{
 
         // Fourth chat window
         VBox fourthChatLayout = new VBox(PADDING);
-        fourthChatLayout.getChildren().addAll(chatLabels[4], goToButtons[1], goToButtons[2],
-                goToButtons[3], goToButtons[4], new Label("Send a message"), chatAreas[4],
+        fourthChatLayout.getChildren().addAll(chatLabels[4], goToButtons[0], goToButtons[1],
+                goToButtons[2], goToButtons[3], new Label("Send a message"), chatAreas[4],
                 sendButtons[4], chatLogLabels[4], chatDisplays[4]);
         fourthChatScene = new Scene(fourthChatLayout, WIDTH, HEIGHT);
 
@@ -251,6 +251,12 @@ public class SceneSwitch extends Application{
             chatLog.add(window + ": " + message);
         }
         fillChatDisplays(chatLog, window);
+    }
+
+    public void onGlobalMessageReceived(String message, int source) {
+        ArrayList<String> chatLog = messageCollections.get(0);
+        chatLog.add(source + ": " + message);
+        fillChatDisplays(chatLog, 0);
     }
 
     public void addOwnMessageToChat(String message, int window) {
