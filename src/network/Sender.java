@@ -57,7 +57,7 @@ public class Sender implements  Runnable{
                 + seqNr // seq number
                 + mind.getSecurity().encrypt(payload,destination); // encoded message
 
-        System.out.println(mesg + " made in sendMessage in Sender");
+       // System.out.println(mesg + " made in send Message in Sender");
 
         mind.updateCurretnMessage(mesg);
         send(mesg);
@@ -117,10 +117,16 @@ public class Sender implements  Runnable{
         send(ack);
     }
 
+
+    /**
+     * this function notifies the sender that it got an ack for its latest package
+     * @param source
+     */
+
     public void receivedAck(String source){
-        System.out.println("Changed for "+ source + " to false");
+       // System.out.println("Changed for "+ source + " to false");
         outStanding.put(source, false);
-        System.out.println(outStanding.get(source));
+        //System.out.println(outStanding.get(source));
     }
 
 

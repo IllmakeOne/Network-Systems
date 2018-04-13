@@ -39,7 +39,7 @@ public class Receiver {
                 dealwithPulse(message);
             } else if(destination.equals(mind.getOwnName())){
                        if( seq.equals(mind.getSeqNers().get(source))) {
-                           System.out.println(message);
+                           //System.out.println(message);
                            if (type.equals(mind.ACK)) {
                                if(mind.getSender().getoutStanding().get
                                        (message.substring(1,2))) {
@@ -99,6 +99,7 @@ public class Receiver {
      */
     public synchronized void UpdateStatuses(){
         long now;
+
         for(String key:statuses.keySet()){
             now = System.currentTimeMillis();
             if(now - statuses.get(key) > mind.OUTOFNETWORKTIMEOUT){
@@ -109,6 +110,10 @@ public class Receiver {
         }
     }
 
+
+    /**
+     * @return the map of people online
+     */
     public HashMap<String, Long> getStatuses(){
         return statuses;
     }
@@ -122,7 +127,7 @@ public class Receiver {
 
         String source = message.substring(1,2);
         //String seq = message.substring(4,5);
-        System.out.println("Received ACk");
+        //System.out.println("Received ACk");
         mind.getSender().receivedAck(source);
 
         mind.updateSeq(source);
@@ -148,7 +153,7 @@ public class Receiver {
        }
 
         // send ack package back to sender
-        System.out.println("senidng ack for " + mess);
+        System.out.println("Ack sent for " + mess.substring(5));
         mind.getSender().sendAck(message.substring(1,2), message.substring(4,5));
     }
 
