@@ -38,10 +38,13 @@ public class Receiver {
             if (type.equals(mind.PULSE)) {
                 dealwithPulse(message);
             } else if(destination.equals(mind.getOwnName())){
-                       if( seq.equals(mind.getSeqNers().get(destination))) {
+                       if( seq.equals(mind.getSeqNers().get(source))) {
                            System.out.println(message);
                            if (type.equals(mind.ACK)) {
-                               dealtwithAck(message);
+                               if(mind.getSender().getoutStanding().get
+                                       (message.substring(1,2))) {
+                                   dealtwithAck(message);
+                               }
                            } else {
                                dealwithMessage(message);
                            }
@@ -111,27 +114,25 @@ public class Receiver {
     }
 
 
+    /**
+     * deal with an ack packaga, inform the sender side its package arrived
+     * @param message
+     */
     public void dealtwithAck(String message){
 
-        String source = message.substring(0,1);
-        String seq = message.substring(4,5);
-
+        String source = message.substring(1,2);
+        //String seq = message.substring(4,5);
+        System.out.println("Received ACk");
         mind.getSender().receivedAck(source);
 
-
-        if(mind.getSeqNers().get(source).equals("9")){
-            mind.getSeqNers().put(source,"0");
-        } else {
-            mind.getSeqNers().put(source,
-                    String.valueOf(Integer.valueOf(mind.getSeqNers().get(source)) +1 ));
-        }
+        mind.updateSeq(source);
 
     }
 
     public void dealwithMessage(String message){
        String mess = mind.getSecurity().decrypt(message.substring(5), message.substring(0,1));
        String destination = message.substring(0,1);
-        String source = message.substring(0,1);
+       String source = message.substring(1,2);
         //arecentMessage.put(message.substring(1,2), message.g)
 
        if(destination.equals("0")){
@@ -142,15 +143,12 @@ public class Receiver {
            //send to upper layer
          //  System.out.println(mess + " " +Integer.valueOf(message.substring(1, 2)));
            mind.getGui().onMessageReceived(mess, Integer.valueOf(message.substring(1, 2)));
-           if(mind.getSeqNers().get(source).equals("9")){
-               mind.getSeqNers().put(source,"0");
-           } else {
-               mind.getSeqNers().put(source,
-                       String.valueOf(Integer.valueOf(mind.getSeqNers().get(source)) +1 ));
-           }
+
+           mind.updateSeq(source);
        }
 
         // send ack package back to sender
+        System.out.println("senidng ack for " + mess);
         mind.getSender().sendAck(message.substring(1,2), message.substring(4,5));
     }
 

@@ -42,20 +42,20 @@ public class Sender implements  Runnable{
      * on the 4th index is the type of message, ack synch(pulse) or a message
      * on the 5th index is the seq number 0 or 1
      * and the rest is the encoded message
-     * @param mtbs = message to be sent
+     *
      *
      * this will run in a new thread and will terminate when it received an ack
      *
      */
-    public void sendMessage(String mtbs){
-
-        String detination = mtbs.substring(0,1);
-        String mesg = detination //destination
-                + mind.getOwnName() // source
-                + "2" // time to live
-                + mind.MESSAGE // type of message
-                + mind.getSeqNers().get(detination) // seq number
-                + mind.getSecurity().encrypt(mtbs.substring(1),detination); // encoded message
+    public synchronized void sendMessage(String destination,String source, String tty, String messageType,
+                                         String seqNr, String payload){
+        int count = 0;
+        String mesg = destination //destination
+                + source // source
+                + tty // time to live
+                + messageType // type of message
+                + seqNr // seq number
+                + mind.getSecurity().encrypt(payload,destination); // encoded message
 
         System.out.println(mesg + " made in sendMessage in Sender");
 
@@ -63,31 +63,39 @@ public class Sender implements  Runnable{
         send(mesg);
 
         outStanding.put(mesg.substring(0,1),true);//note down its waiting for an ack
-        timeouts.put(detination, System.currentTimeMillis());//note down time for the timeout calcualtion
+        timeouts.put(destination, System.currentTimeMillis());//note down time for the timeout calcualtion
 
-        while(outStanding.get(detination) == true){
-            if (System.currentTimeMillis() - timeouts.get(detination) > mind.TIMEOUTLIMIT){
-
-                timeouts.put(detination, System.currentTimeMillis());
+        while(outStanding.get(destination) == true){
+            if (System.currentTimeMillis() - timeouts.get(destination) > mind.TIMEOUTLIMIT){
+                count++;
+                timeouts.put(destination, System.currentTimeMillis());
 
                 send(mesg);
 
                 mind.updateCurretnMessage(mesg);
+                System.err.println("reseinding  messagE");
+            }
+            if(count >5 ){
+                break;
             }
         }
 
-        System.out.println("got Ack for " + mtbs);
+        if(count == 6){
+            System.out.println(payload + " has not recieved ack");
+            outStanding.put(destination,false);
+        } else {
+            System.out.println("got Ack for " + payload);
+        }
 
         //change the sequance number asociated to a node
-        if(mind.getSeqNers().get(detination).equals("9")){
-            mind.getSeqNers().put(detination,"0");
-        } else {
-            mind.getSeqNers().put(detination,
-                    String.valueOf(Integer.valueOf(mind.getSeqNers().get(detination)) -1));
-        }
+        //mind.updateSeq(detination);
 
     }
 
+    /**
+     * send message on all chat
+     * @param message
+     */
     public void sendGlobalMessage(String message){
 
     }
@@ -110,7 +118,9 @@ public class Sender implements  Runnable{
     }
 
     public void receivedAck(String source){
+        System.out.println("Changed for "+ source + " to false");
         outStanding.put(source, false);
+        System.out.println(outStanding.get(source));
     }
 
 

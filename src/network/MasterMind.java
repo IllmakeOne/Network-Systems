@@ -128,18 +128,26 @@ public class MasterMind implements Runnable {
      */
     public void sendMessage(String message){
 
-        System.out.println(message + " In send msessage MAstermind");
+      //  System.out.println(message + " In send msessage MAstermind");
 
         if(receiver.getStatuses().keySet().contains(message.substring(0,1))){
             while (sender.getoutStanding().get(message.substring(0, 1))) {
                 try {
-                    TimeUnit.MILLISECONDS.sleep(10);
+                    TimeUnit.MILLISECONDS.sleep(50);
+                    //System.out.println("waiting to finish up his messageing");
                 } catch (InterruptedException e) {
                     System.err.println("could not wait int Mastermind SendMessage,for some reason");
                 }
             }
+            System.out.println("seq nr for " +message.substring(0,1)+ " is " +
+                    seqNrs.get(message.substring(0,1)));
 
-            new Thread(() -> sender.sendMessage(message)).start();
+            new Thread(() -> sender.sendMessage(message.substring(0,1),//destination
+                             ownName,   // source
+                            "2",    // time to live
+                            MESSAGE, //type of message
+                            seqNrs.get(message.substring(0,1)), // seqnr
+                            message.substring(1))).start();     //message
         } else {
             System.out.println("node not online");
         }
@@ -150,6 +158,22 @@ public class MasterMind implements Runnable {
             new Thread(() -> sender.sendGlobalMessage(message)).start();
         }
 
+    }
+
+
+    /**
+     * increases the sequance number with a node by one
+     * @param source
+     */
+    public void updateSeq(String source){
+        System.out.println("Changed Seq nr of " + source + " from " + getSeqNers().get(source));
+        if(getSeqNers().get(source).equals("9")){
+            getSeqNers().put(source,"0");
+        } else {
+            getSeqNers().put(source,
+                    String.valueOf(Integer.valueOf(getSeqNers().get(source)) + 1));
+        }
+        System.out.println("to " + getSeqNers().get(source));
     }
 
     public void updateCurretnMessage(String msg){
