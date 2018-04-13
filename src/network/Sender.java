@@ -97,7 +97,6 @@ public class Sender implements  Runnable{
      * @param message
      */
     public void sendGlobalMessage(String message){
-        int count = 0;
         String mesg = "0" + mind.getOwnName() + "2" +
                     mind.MESSAGE + "0" + message.substring(1);
         send(mesg);

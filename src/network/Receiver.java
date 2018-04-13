@@ -50,6 +50,8 @@ public class Receiver {
                            }
                        }
 
+            } else if(destination.equals("0") && seq.equals(mind.getSeqNers().get("0"))){
+                delawithGlobalMessage(message.substring(5),source);
             }
 
 //        if(message.substring(3,4).equals(mind.PULSE)){
@@ -90,6 +92,11 @@ public class Receiver {
         statuses.put(message.substring(0,1),System.currentTimeMillis());
 
 
+    }
+
+    public void delawithGlobalMessage(String message,String fromWho){
+        mind.getGui().onGlobalMessageReceived(message, Integer.valueOf(fromWho));
+        mind.updateSeq("0");
     }
 
 
@@ -153,7 +160,7 @@ public class Receiver {
        }
 
         // send ack package back to sender
-        System.out.println("Ack sent for " + mess.substring(5));
+        System.out.println("Ack sent for " + message.substring(1));
         mind.getSender().sendAck(message.substring(1,2), message.substring(4,5));
     }
 

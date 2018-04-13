@@ -59,6 +59,10 @@ public class MasterMind implements Runnable {
         this.gui = gui;
 
         seqNrs = new HashMap<>();
+
+        //initualize the sequance number fo global chat
+        seqNrs.put("0","0");
+
         keys = new Security();
         on = true;
         try {
@@ -147,8 +151,10 @@ public class MasterMind implements Runnable {
         } else {
             //if someone tried to send a message to an offlien node,
             // then it will tell the guy that it is not online
-            gui.onMessageReceived(gui.OFFLINE,
-                    Integer.valueOf(message.substring(0,1)));
+            if(!message.substring(0,1).equals("0")) {
+                gui.onMessageReceived(gui.OFFLINE,
+                        Integer.valueOf(message.substring(0, 1)));
+            }
             //System.out.println("node not online");
         }
 
