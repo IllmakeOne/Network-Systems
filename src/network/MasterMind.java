@@ -30,7 +30,6 @@ public class MasterMind implements Runnable {
 
     private SceneSwitch gui;
 
-    public String currentMessage = "";
 
     //list to keep track of sequance numbers with other nodes
     private HashMap<String, String> seqNrs;
@@ -70,7 +69,7 @@ public class MasterMind implements Runnable {
             group = InetAddress.getByName("228.0.0.0");
             sock.joinGroup(group);
             sender = new Sender(sock, this);
-            receiver = new Receiver(sock, this);
+            receiver = new Receiver(this);
         } catch (IOException e){
             System.err.println("Could not connect to port or IPgroup");
         }
@@ -79,7 +78,7 @@ public class MasterMind implements Runnable {
     @Override
     public void run() {
 
-        //start a new thread which will pulse each second
+        //start a new thread which will send a pulse each second
         Thread pulsing = new Thread(sender);
         pulsing.start();
 
@@ -98,17 +97,7 @@ public class MasterMind implements Runnable {
             String stringmess = datagrampacketTostring(recv);
 
             receiver.dealWithPacket(stringmess);
-//            if(!stringmess.substring(1,2).equals(ownName)) {
-//                // System.out.println(stringmess);
-//                if (!seqNrs.keySet().contains(stringmess.substring(1, 2))) {
-//                    receiver.dealWithPacket(stringmess);
-//                } else if (seqNrs.get(stringmess.substring(1, 2)).equals(stringmess.substring(4, 5))) {
-//                    receiver.dealWithPacket(stringmess);
-//                } else if (stringmess.substring(3, 4).equals(PULSE)) {
-//                    receiver.dealwithMessage(stringmess);
-//                    //receiver.dealwithMessage(stringmess);
-//                }
-//            }
+
 
         }
     }
@@ -182,9 +171,6 @@ public class MasterMind implements Runnable {
       //  System.out.println("to " + getSeqNers().get(source));
     }
 
-    public void updateCurretnMessage(String msg){
-        this.currentMessage = msg;
-    }
 
     public void turnOff(){
         this.on = false;

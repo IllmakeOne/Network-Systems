@@ -60,7 +60,6 @@ public class Sender implements  Runnable{
 
        // System.out.println(mesg + " made in send Message in Sender");
 
-        mind.updateCurretnMessage(mesg);
         send(mesg);
 
         outStanding.put(mesg.substring(0,1),true);//note down its waiting for an ack
@@ -73,7 +72,6 @@ public class Sender implements  Runnable{
 
                 send(mesg);
 
-                mind.updateCurretnMessage(mesg);
                 System.err.println("reseinding  messagE");
             }
             if(count >5 ){
@@ -144,8 +142,8 @@ public class Sender implements  Runnable{
      * in this way anyone who connects to a network will receive the public keys of nodes conected
      */
     public void sendPulse(){
-        String puseWithKey = mypulse + mind.getSecurity().getOwnPubickey();
-        send(puseWithKey);
+       // String puseWithKey = mypulse + mind.getSecurity().getOwnPubickey();
+        send(mypulse);
 
     }
 

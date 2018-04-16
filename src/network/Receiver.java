@@ -8,24 +8,24 @@ import java.util.concurrent.ConcurrentHashMap;
 public class Receiver {
 
 
-    private MulticastSocket sock;
+
     private  MasterMind mind;
 
-    private HashMap<String, String> recentMessage;
 
     //this keeps in mind each time it receives a pulse from a node so it knows it's in the network
     private ConcurrentHashMap<String, Long> statuses;
 
 
 
-    public Receiver(MulticastSocket socket, MasterMind mind){
-        this.sock = socket;
+    public Receiver(MasterMind mind){
         this.mind = mind;
         statuses = new ConcurrentHashMap<String, Long>();
-        recentMessage = new HashMap<>();
     }
 
 
+    /**
+     * this methods deal with whatever package the node receives.
+     */
     public void dealWithPacket(String message){
 
 
@@ -58,17 +58,7 @@ public class Receiver {
                 }
             }
 
-//        if(message.substring(3,4).equals(mind.PULSE)){
-//            dealwithPulse(message);
-//        } else if(message.substring(0,1).equals(mind.getOwnName())){
-//            System.out.println(message);
-//            if(message.substring(3,4).equals(mind.ACK)){
-//
-//                dealtwithAck(message);
-//            } else {
-//                dealwithMessage(message);
-//            }
-//        }
+
 
             forwardPack(message);
         }
@@ -78,6 +68,7 @@ public class Receiver {
 
     /**
      * this function checks if the pulse message it got is from a new node in the network
+     * and also refreshes the timer on the node the pulse comes from.
      * @param message
      */
     public synchronized void dealwithPulse(String message){
@@ -87,24 +78,30 @@ public class Receiver {
 
             System.out.println(message.substring(0,1) + " has come online");
 
-            statuses.put(message.substring(0,1),System.currentTimeMillis());
+            //
+            mind.getSeqNers().put("0","0");
+           // statuses.put(message.substring(0,1),System.currentTimeMillis());
             mind.getSeqNers().put(message.substring(0,1),"0");
             mind.getSender().getoutStanding().put(message.substring(0,1),false);
 
-            // if it is a node freshly connected to the network, its key is added to the map of public keyes
         }
 
-        //System.out.println("updated time for "+ message.substring(0,1));
+
         statuses.put(message.substring(0,1),System.currentTimeMillis());
 
 
     }
 
+
+    /**
+     * this method send a global message to the global chat on the GUI
+     * @param message the message itself
+     * @param fromWho this is always "0" as the function is called only for global messages
+     */
     public void delawithGlobalMessage(String message,String fromWho){
-        //System.out.println(mind.getSeqNers().get("0") + " seq at deal with global message");
+
         mind.getGui().onGlobalMessageReceived(message, Integer.valueOf(fromWho));
         mind.updateSeq("0");
-        //System.out.println(mind.getSeqNers().get("0") + " after it made it bigger ");
     }
 
 
