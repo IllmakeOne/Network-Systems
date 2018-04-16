@@ -20,12 +20,10 @@ public class MasterMind implements Runnable {
     public static final String MESSAGE = "m";
     public static final String PULSE = "p";
     public static final int TIMEOUTLIMIT = 1000;
-    public static final int OUTOFNETWORKTIMEOUT = 1500;
+    public static final int OUTOFNETWORKTIMEOUT = 5000;
 
     private boolean on;
 
-    //list keeping track of clinets in the network
-    private ArrayList<String> nodeOnline;
 
     //own name
     private String ownName;
@@ -63,8 +61,10 @@ public class MasterMind implements Runnable {
         //initualize the sequance number fo global chat
         seqNrs.put("0","0");
 
-        keys = new Security();
+        keys = new Security(ownName);
+
         on = true;
+
         try {
             sock = new MulticastSocket(port);
             group = InetAddress.getByName("228.0.0.0");
@@ -171,7 +171,7 @@ public class MasterMind implements Runnable {
      * increases the sequance number with a node by one
      * @param source
      */
-    public void updateSeq(String source){
+    public synchronized void updateSeq(String source){
       //  System.out.println("Changed Seq nr of " + source + " from " + getSeqNers().get(source));
         if(getSeqNers().get(source).equals("9")){
             getSeqNers().put(source,"0");
@@ -192,10 +192,6 @@ public class MasterMind implements Runnable {
 
     public HashMap<String, String> getSeqNers(){
         return seqNrs;
-    }
-
-    public ArrayList<String> getNodeOnline(){
-        return nodeOnline;
     }
 
     public String getOwnName(){

@@ -3,6 +3,7 @@ package network;
 import java.net.MulticastSocket;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.concurrent.ConcurrentHashMap;
 
 public class Receiver {
 
@@ -13,14 +14,14 @@ public class Receiver {
     private HashMap<String, String> recentMessage;
 
     //this keeps in mind each time it receives a pulse from a node so it knows it's in the network
-    private HashMap<String, Long> statuses;
+    private ConcurrentHashMap<String, Long> statuses;
 
 
 
     public Receiver(MulticastSocket socket, MasterMind mind){
         this.sock = socket;
         this.mind = mind;
-        statuses = new HashMap<String, Long>();
+        statuses = new ConcurrentHashMap<String, Long>();
         recentMessage = new HashMap<>();
     }
 
@@ -79,7 +80,7 @@ public class Receiver {
      * this function checks if the pulse message it got is from a new node in the network
      * @param message
      */
-    public void dealwithPulse(String message){
+    public synchronized void dealwithPulse(String message){
 
 
         if(!statuses.keySet().contains(message.substring(0,1))){
@@ -89,6 +90,9 @@ public class Receiver {
             statuses.put(message.substring(0,1),System.currentTimeMillis());
             mind.getSeqNers().put(message.substring(0,1),"0");
             mind.getSender().getoutStanding().put(message.substring(0,1),false);
+
+            // if it is a node freshly connected to the network, its key is added to the map of public keyes
+            mind.getSecurity().addPubickey(message.substring(0,1),message.substring(4));
         }
 
         //System.out.println("updated time for "+ message.substring(0,1));
@@ -109,7 +113,7 @@ public class Receiver {
      * this function checks if it has received in the last 3 second a pulse from the nodes conected
      * if it has not, it removes it from the list
      */
-    public synchronized void UpdateStatuses(){
+    public void UpdateStatuses(){
         long now;
 
         for(String key:statuses.keySet()){
@@ -126,7 +130,7 @@ public class Receiver {
     /**
      * @return the map of people online
      */
-    public HashMap<String, Long> getStatuses(){
+    public ConcurrentHashMap<String, Long> getStatuses(){
         return statuses;
     }
 

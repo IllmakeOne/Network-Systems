@@ -25,7 +25,7 @@ public class Sender implements  Runnable{
 
         outStanding = new HashMap<String, Boolean>();
         timeouts = new HashMap<>();
-      //  timeouts = new HashMap<String, Long>();
+
 
         mypulse = mind.getOwnName() //the name
                 + mind.getOwnName() // it is double so the protocol is respected
@@ -123,7 +123,7 @@ public class Sender implements  Runnable{
 
 
     /**
-     * this function notifies the sender that it got an ack for its latest package
+     * this method notifies the sender that it got an ack for its latest package
      * @param source
      */
 
@@ -139,9 +139,12 @@ public class Sender implements  Runnable{
     /**
      * this is a pulse, its purpose is to inform the other in the netwrok that they are alive
      * Each pulse is of the form name+time to live + type of msesage
+     * and after all that its public key,
+     * in this way anyone who connects to a network will receive the public keys of nodes conected
      */
     public void sendPulse(){
-        send(mypulse);
+        String puseWithKey = mypulse + mind.getSecurity().getOwnPubickey();
+        send(puseWithKey);
 
     }
 
