@@ -51,7 +51,7 @@ public class Sender implements  Runnable{
     public synchronized void sendMessage(String destination,String source, String tty, String messageType,
                                          String seqNr, String payload){
         int count = 0;
-        String mesg = destination //destination
+        String mesg = destination ///*
                 + source // source
                 + tty // time to live
                 + messageType // type of message

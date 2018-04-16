@@ -1,15 +1,21 @@
 package security;
 
+import sun.misc.BASE64Decoder;
+
 import javax.crypto.Cipher;
+import javax.crypto.NoSuchPaddingException;
 import javax.crypto.spec.SecretKeySpec;
+import java.io.IOException;
 import java.security.*;
+import java.security.spec.InvalidKeySpecException;
+import java.security.spec.X509EncodedKeySpec;
 import java.util.Base64;
 import java.util.HashMap;
 
 public class Security {
 
 	//a map of all the public keys in the network
-	private HashMap<String, PublicKey> publicKeys;
+	private HashMap<String, Key> publicKeys;
 
 	//the private key of this node
 	private String ownPrivatekey;
@@ -31,9 +37,23 @@ public class Security {
 		//publicKeys.put("0",globalChatKey);
 	}
 
+
+
 	// encrypt a message with the destination's public key
-    public static String encrypt(String strClearText,String strKey){
-        return  strClearText;
+    public static String encrypt(String unencrypteMessage, String destination){
+/*
+		try {
+			PublicKey key = publicKeys.get(destination);
+			Cipher cipher = Cipher.getInstance("RSA");
+			cipher.init(Cipher.PUBLIC_KEY, publicKeys.get(destination));
+
+		} catch (NoSuchAlgorithmException| NoSuchPaddingException e){
+			System.err.println("coult not encrypt");
+		}
+		*/
+
+
+		return  unencrypteMessage;
     }
 
     // decrypt a message with the node's private key,
@@ -57,9 +77,35 @@ public class Security {
 
 
 	//this method adds a public key to the map of public keys
-//	public void addPubickey(String node, String publickey){
-//		publicKeys.put(node,publickey);
-//	}
+
+	/**
+	 * convert a string into a publickey
+	 * @param node
+	 * @param publickeystring
+	 */
+	public void addPubickey(String node, String publickeystring){
+
+		try {
+			BASE64Decoder decoder = new BASE64Decoder();
+
+			byte[] sigBytes2 = decoder.decodeBuffer(publickeystring);
+
+			X509EncodedKeySpec x509KeySpec = new X509EncodedKeySpec(sigBytes2);
+
+			KeyFactory keyFact = KeyFactory.getInstance("RSA", "BC");
+
+			PublicKey key = keyFact.generatePublic(x509KeySpec);
+
+
+			publicKeys.put(node, key);
+		} catch ( IOException e) {
+			System.err.println("coulnd not convert keystring to key");
+		} catch ( NoSuchAlgorithmException | NoSuchProviderException | InvalidKeySpecException e){
+
+			System.err.println("coulnd not convert keystring to key");
+
+		}
+	}
 
 	private void generateKeyPair(){
 
@@ -74,18 +120,21 @@ public class Security {
 
 			KeyPair pair = keyGen.generateKeyPair();
 
-			System.out.println(pair.getPrivate());
-			System.out.println(pair.getPublic());
+			//System.out.println(pair.getPrivate());
+			//System.out.println(pair.getPublic());
 
 			Base64.Encoder encoder = Base64.getEncoder();
 			PrivateKey priv = pair.getPrivate();
 			PublicKey pub = pair.getPublic();
 
-			System.out.println("privateKey: " + encoder.encodeToString(priv.getEncoded()));
-			System.out.println("publicKey: " + encoder.encodeToString(pub.getEncoded()));
 
-			//	this.ownPublickey = pair.getPublic();
-		//	this.ownPrivatekey = pair.getPrivate();
+			ownPublickey = encoder.encodeToString(pub.getEncoded());
+
+			ownPrivatekey = encoder.encodeToString(priv.getEncoded());
+
+			System.out.println("ownPublickey  " + ownPublickey);
+			System.out.println("ownPrivatekey " + ownPrivatekey);
+
 
 
 		} catch (NoSuchAlgorithmException e){
