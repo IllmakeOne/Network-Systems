@@ -92,6 +92,7 @@ public class Receiver {
             mind.getSender().getoutStanding().put(message.substring(0,1),false);
 
             // if it is a node freshly connected to the network, its key is added to the map of public keyes
+            System.out.println(message.substring(4));
             mind.getSecurity().addPubickey(message.substring(0,1),message.substring(4));
         }
 
