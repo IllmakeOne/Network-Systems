@@ -30,7 +30,8 @@ public class Sender implements  Runnable{
         mypulse = mind.getOwnName() //the name
                 + mind.getOwnName() // it is double so the protocol is respected
                 + "2" // time to live
-                + mind.PULSE; // type of message
+                + mind.PULSE // type of message
+                + "0";
 
     }
 
