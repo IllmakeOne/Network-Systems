@@ -2,7 +2,6 @@ package gui;
 
 import javafx.application.Application;
 import javafx.beans.value.ChangeListener;
-import javafx.beans.value.ObservableValue;
 import javafx.event.ActionEvent;
 import javafx.event.EventHandler;
 import javafx.scene.Scene;
@@ -25,7 +24,6 @@ public class SceneSwitch extends Application {
     private static final int INPUT_CHAT_HEIGHT = 50;
     private static final int NUM_OF_CHATS = 5;
     private MasterMind masterMind;
-    private String SOURCE;
     private Stage window;
 
     private Button[] goToButtons = new Button[NUM_OF_CHATS];
@@ -42,7 +40,7 @@ public class SceneSwitch extends Application {
 
     @Override
     public void start(Stage primaryStage) throws Exception {
-        SOURCE = getParameters().getUnnamed().get(0);
+        String SOURCE = getParameters().getUnnamed().get(0);
         initializeLabels();
         initializeChatAreas();
         initializeMessages();
@@ -102,16 +100,12 @@ public class SceneSwitch extends Application {
         initializeButtons();
         initializeLabels();
 
-//        fillChatDisplays(messageCollections.get(1), 1);
-//        onMessageReceived("1", 1);
-
         // Set the beginning scene
         window.setScene(firstChatScene);
         window.setTitle("Best chatting application, user: " + SOURCE);
         window.show();
 
-
-        this.masterMind = new MasterMind(SOURCE, this);
+        masterMind = new MasterMind(SOURCE, this);
         Thread masternode = new Thread(masterMind);
         masternode.start();
     }
@@ -126,13 +120,8 @@ public class SceneSwitch extends Application {
             temp.setEditable(false);
 
             // implements auto scroll to the bottom
-            temp.textProperty().addListener(new ChangeListener<Object>() {
-                @Override
-                public void changed(ObservableValue<?> observable, Object oldValue,
-                                    Object newValue) {
-                    temp.setScrollTop(Double.MAX_VALUE);
-                }
-            });
+            temp.textProperty().addListener((ChangeListener<Object>)
+                    (observable, oldValue, newValue) -> temp.setScrollTop(Double.MAX_VALUE));
 
             chatDisplays[i] = temp;
         }
@@ -259,7 +248,7 @@ public class SceneSwitch extends Application {
         fillChatDisplays(chatLog, 0);
     }
 
-    public void addOwnMessageToChat(String message, int window) {
+    private void addOwnMessageToChat(String message, int window) {
         ArrayList<String> chatLog = messageCollections.get(window);
         chatLog.add("ME: " + message);
         fillChatDisplays(chatLog, window);
