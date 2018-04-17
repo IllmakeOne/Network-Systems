@@ -66,10 +66,5 @@ public class Security {
         return new String(message);
     }
 
-    public static void main(String[] args) {
-        Security security = new Security("1");
-        String encrypted = security.encrypt("asdgsdakjlgadgslkjgadsljkkamjkklkljkl  hfh", "1");
-        String decrypted = security.decrypt(encrypted, "1");
-        System.out.println(decrypted);
-    }
+
 }
