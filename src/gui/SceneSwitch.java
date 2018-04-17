@@ -107,11 +107,11 @@ public class SceneSwitch extends Application {
 
         // Set the beginning scene
         window.setScene(firstChatScene);
-        window.setTitle("Best chatting application");
+        window.setTitle("Best chatting application, user: " + SOURCE);
         window.show();
 
 
-        this.masterMind = new MasterMind(SOURCE, this);;
+        this.masterMind = new MasterMind(SOURCE, this);
         Thread masternode = new Thread(masterMind);
         masternode.start();
     }
