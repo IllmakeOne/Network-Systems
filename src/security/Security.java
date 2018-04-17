@@ -1,4 +1,5 @@
 package security;
+import java.security.NoSuchAlgorithmException;
 import java.security.SecureRandom;
 
 public class Security {
@@ -8,7 +9,12 @@ public class Security {
 
     public Security(String name) {
         id = name;
-        SecureRandom random = new SecureRandom();
+        SecureRandom random = null;
+        try {
+            random = SecureRandom.getInstance("NativePRNG");
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        }
         random.setSeed(1);
 
         for (int i = 0; i < 5; i++) {
