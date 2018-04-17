@@ -2,11 +2,18 @@ package security;
 
 import java.util.Random;
 
+/*
+    The Security class is responsible for generating one time pads for every client and for encrypting
+    and decrypting outgoing and incoming messages respectively.
+ */
+
 public class Security {
-    public static final String globalChatKey = "s";
     private String id;
     private byte[][] oneTimePads = new byte[5][5000];
 
+    /*
+        Constructs a security instances and fills the oneTimePads array with data.
+     */
     public Security(String name) {
         id = name;
         Random random = new Random();
@@ -17,9 +24,11 @@ public class Security {
         }
     }
 
-    // encrypt a message with the destination's public key
-    public String encrypt(String unencrypteMessage, String destination){
-        byte[] message = unencrypteMessage.getBytes();
+    /*
+        Encrypts an unencrypted and returns it as a bit STRING.
+     */
+    public String encrypt(String unencryptedMessage, String destination){
+        byte[] message = unencryptedMessage.getBytes();
         byte[] key = oneTimePads[Integer.valueOf(destination)];
         StringBuilder result = new StringBuilder();
 
@@ -35,8 +44,10 @@ public class Security {
         return result.toString();
     }
 
-    // decrypt a message with the node's private key,
-    // it can only decrypt messages addressed to it and global chart messages
+    /*
+        Decrypts a message and returns it as the original string. The decryption is done by
+        XOR-ing the key and the bits in each byte.
+     */
     public String decrypt(String strEncrypted, String from) {
         byte[] message = new byte[strEncrypted.length() / 8];
 
@@ -45,13 +56,13 @@ public class Security {
             if (substring.length() != 8) {
                 break;
             }
-            Integer substringAsInteger = Integer.valueOf(substring, 2);
-            int num = (int) substringAsInteger;
+            int num = Integer.valueOf(substring, 2);
             Byte b1 = (byte) num;
             message[i / 8] = b1;
         }
 
         byte[] key;
+
         // in case of global chat
         if (from.equals("0")) {
             key = oneTimePads[0];
@@ -65,6 +76,4 @@ public class Security {
 
         return new String(message);
     }
-
-
 }
