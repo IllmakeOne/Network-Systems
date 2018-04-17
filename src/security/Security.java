@@ -1,6 +1,6 @@
 package security;
-import java.security.NoSuchAlgorithmException;
-import java.security.SecureRandom;
+
+import java.util.Random;
 
 public class Security {
     public static final String globalChatKey = "s";
@@ -9,12 +9,7 @@ public class Security {
 
     public Security(String name) {
         id = name;
-        SecureRandom random = null;
-        try {
-            random = SecureRandom.getInstance("NativePRNG");
-        } catch (NoSuchAlgorithmException e) {
-            e.printStackTrace();
-        }
+        Random random = new Random();
         random.setSeed(1);
 
         for (int i = 0; i < 5; i++) {
