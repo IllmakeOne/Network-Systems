@@ -16,10 +16,13 @@ import java.util.concurrent.TimeUnit;
 public class MasterMind implements Runnable {
 
 
+    //Some protocol finals
     public static final String ACK = "a";
     public static final String MESSAGE = "m";
     public static final String PULSE = "p";
-    public static final int TIMEOUTLIMIT = 1000;
+
+    public static final int TIMEOUTLIMIT = 1500;
+
     public static final int OUTOFNETWORKTIMEOUT = 5000;
 
     private boolean on;
@@ -28,6 +31,7 @@ public class MasterMind implements Runnable {
     //own name
     private String ownName;
 
+    //the gui
     private SceneSwitch gui;
 
 
@@ -38,23 +42,35 @@ public class MasterMind implements Runnable {
     private MulticastSocket sock;
 
 
-
+    // class sender which is used to send all types of messages using the Multicastsocket
     private Sender sender;
+
+    //class Receiver used for dealing with all types of messages
     private Receiver receiver;
 
+    //port
     private static final int port = 2629;
+    //internet address of our group
     private InetAddress group;
 
+    //the security class which encrypt and decrypt
     private Security keys;
 
-
+    /**
+     * An instance of the class Mastermind is made in the GUI and is ran in a separate thread
+     *
+     * Constructor of the Mastermind
+     * @param name is the name of this node
+     * @param gui  is the GUI connected to this node, messages will be send to it
+     *
+     */
     public MasterMind(String name, SceneSwitch gui){
 
-
+        //initiate name
         ownName = name;
-
+        //initiate gui
         this.gui = gui;
-
+        //initiate the seqace numbers map
         seqNrs = new HashMap<>();
 
         //initualize the sequance number fo global chat

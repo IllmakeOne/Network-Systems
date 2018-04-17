@@ -30,8 +30,8 @@ public class Receiver {
 
 
         String destination = message.substring(0,1);
-        String type = message.substring(3,4);
         String source = message.substring(1,2);
+        String type = message.substring(3,4);
         String seq = message.substring(4,5);
 
         if(!source.equals(mind.getOwnName())) {
@@ -95,12 +95,13 @@ public class Receiver {
 
     /**
      * this method send a global message to the global chat on the GUI
-     * @param message the message itself
+     * @param message the message itself, encrypted
      * @param fromWho this is always "0" as the function is called only for global messages
      */
     public void delawithGlobalMessage(String message,String fromWho){
 
-        mind.getGui().onGlobalMessageReceived(message, Integer.valueOf(fromWho));
+        mind.getGui().onGlobalMessageReceived(mind.getSecurity().decrypt(message,"0")
+                , Integer.valueOf(fromWho));
         mind.updateSeq("0");
     }
 
@@ -165,7 +166,7 @@ public class Receiver {
        }
 
         // send ack package back to sender
-        System.out.println("Ack sent for " + message.substring(1));
+        System.out.println("Ack sent for " + message);
         mind.getSender().sendAck(message.substring(1,2), message.substring(4,5));
     }
 
@@ -178,25 +179,21 @@ public class Receiver {
      */
     public void forwardPack(String message){
         if(!message.substring(2,3).equals("0")){
-            if(!message.substring(1,2).equals(mind.getOwnName())){
-                int lowerTTL = Integer.valueOf(message.substring(2,3))-1;
-                String lowerTTLmessage = message.substring(0,2) + lowerTTL + message.substring(3);
+            if(!message.substring(1,2).equals(mind.getOwnName())
+                    && !message.substring(0,1).equals((mind.getOwnName()))) {
+                if (!message.substring(3, 4).equals(mind.PULSE)) {
+                    System.out.println("Forwarding " + message);
+                }
+                int lowerTTL = Integer.valueOf(message.substring(2, 3)) - 1;
+                String lowerTTLmessage = message.substring(0, 2) + lowerTTL + message.substring(3);
                 mind.getSender().send(lowerTTLmessage);
+
+                if (!message.substring(3, 4).equals(mind.PULSE)) {
+                    System.out.println("------------------");
+                }
             }
         }
     }
-//        if(!message.substring(0,1).equals(mind.getOwnName())) { //if the message is for itself, do not forward it
-//            String reformatedMessage = message.substring(0, 2);
-//
-//            int stupid = Integer.valueOf(message.substring(2, 3)) - 1;
-//          //  System.out.println(stupid+ " in foward");
-//
-//            if (!message.substring(2, 3).equals("0")) { //if the package's time to live is 0 do not forward it
-//                reformatedMessage = reformatedMessage + stupid + message.substring(3);
-//                mind.getSender().send(reformatedMessage);
-//            }
-//        }
-//    }
 }
 
 

@@ -72,7 +72,7 @@ public class Sender implements  Runnable{
 
                 send(mesg);
 
-                System.err.println("reseinding  messagE");
+                System.err.println("Retransmitting  message");
             }
             if(count >5 ){
                 break;
@@ -96,10 +96,17 @@ public class Sender implements  Runnable{
      * @param message
      */
     public void sendGlobalMessage(String message){
-        String mesg = "0" + mind.getOwnName() + "2" +
-                    mind.MESSAGE + mind.getSeqNers().get("0") + message.substring(1);
+        String mesg = "0"       //destination group chat
+                    + mind.getOwnName()  //from itself
+                     + "2"               // time to live
+                    + mind.MESSAGE       // type of package, message
+                    + mind.getSeqNers().get("0")        //global chat seq nr
+                    + mind.getSecurity().encrypt(message.substring(1),"0"); // encode the message
+
         mind.updateSeq("0");
+
         send(mesg);
+
        // System.out.println(mind.getSeqNers().get("0") +  "message sent");
     }
 
@@ -169,6 +176,9 @@ public class Sender implements  Runnable{
      */
     public void send(String message){
         try {
+            if(!message.substring(3,4).equals(mind.PULSE)) {
+                System.out.println("Sending " + message);
+            }
             sock.send(stringTodatagrampacket(message));
         } catch (IOException e){
             System.err.println("Unable to send message in Sender");
