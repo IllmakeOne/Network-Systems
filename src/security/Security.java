@@ -1,14 +1,13 @@
+package security;
 import java.security.SecureRandom;
-import java.util.Arrays;
 
 public class Security {
-	public static final String globalChatKey = "s";
-	private String id;
+    public static final String globalChatKey = "s";
+    private String id;
     private byte[][] oneTimePads = new byte[5][5000];
 
     public Security(String name) {
         id = name;
-
         SecureRandom random = new SecureRandom();
         random.setSeed(1);
 
@@ -16,13 +15,14 @@ public class Security {
             random.nextBytes(oneTimePads[i]);
         }
     }
-	// encrypt a message with the destination's public key
-	public String encrypt(String unencrypteMessage, String destination){
+
+    // encrypt a message with the destination's public key
+    public String encrypt(String unencrypteMessage, String destination){
         byte[] message = unencrypteMessage.getBytes();
         byte[] key = oneTimePads[Integer.valueOf(destination)];
         StringBuilder result = new StringBuilder();
 
-        // xor with the key, use strings to represent bytes (string 00000010 being 2).
+        // XOR with the key, use strings to represent bytes (string 00000010 being 2).
         for (int i = 0; i < message.length && i < key.length; i++) {
             message[i] = (byte) (message[i] ^ key[i]);
 
@@ -31,34 +31,34 @@ public class Security {
             result.append(s1);
         }
 
-		return result.toString();
-	}
+        return result.toString();
+    }
 
-	// decrypt a message with the node's private key,
-	// it can only decrypt messages addressed to it and global chart messages
-	public String decrypt(String strEncrypted, String from) {
-	    byte[] message = new byte[strEncrypted.length() / 8];
+    // decrypt a message with the node's private key,
+    // it can only decrypt messages addressed to it and global chart messages
+    public String decrypt(String strEncrypted, String from) {
+        byte[] message = new byte[strEncrypted.length() / 8];
 
-	    for (int i = 0; i < strEncrypted.length(); i += 8) {
-	        String substring = strEncrypted.substring(i, i + 8);
-	        Integer substringAsInteger = Integer.valueOf(substring, 2);
-	        int num = (int) substringAsInteger;
-	        Byte b1 = (byte) num;
+        for (int i = 0; i < strEncrypted.length(); i += 8) {
+            String substring = strEncrypted.substring(i, i + 8);
+            Integer substringAsInteger = Integer.valueOf(substring, 2);
+            int num = (int) substringAsInteger;
+            Byte b1 = (byte) num;
             message[i / 8] = b1;
         }
 
-	    byte[] key = oneTimePads[Integer.valueOf(id)];
+        byte[] key = oneTimePads[Integer.valueOf(id)];
 
         for (int i = 0; i < message.length && i < key.length; i++) {
             message[i] = (byte) (message[i] ^ key[i]);
         }
 
-		return new String(message);
-	}
+        return new String(message);
+    }
 
-	public static void main(String[] args) {
-	    Security security = new Security("1");
-	    String encrypted = security.encrypt("asdgkadsgljk!~!!!!!sadjgasgdkljgsadj", "1");
-	    String decrypted = security.decrypt(encrypted, "1");
+    public static void main(String[] args) {
+        Security security = new Security("1");
+        String encrypted = security.encrypt("asdgkadsgljk!~!!!!!sadjgasgdkljgsadj", "1");
+        String decrypted = security.decrypt(encrypted, "1");
     }
 }
