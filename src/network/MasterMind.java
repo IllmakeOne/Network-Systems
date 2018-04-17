@@ -10,6 +10,7 @@ import java.net.DatagramPacket;
 import java.net.InetAddress;
 import java.net.MulticastSocket;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.concurrent.TimeUnit;
 
@@ -95,6 +96,20 @@ public class MasterMind implements Runnable {
         }
     }
 
+    /**
+     * cut off all empty bytes
+     */
+    static byte[] CutEmptyBytes(byte[] msg)
+    {
+        int index = msg.length - 1;
+        while (index >= 0 && msg[index] == 0)
+        {
+            --index;
+        }
+
+        return Arrays.copyOf(msg, index + 1);
+    }
+
     @Override
     public void run() {
 
@@ -114,7 +129,10 @@ public class MasterMind implements Runnable {
                 System.err.println("Could not receive window");
             }
 
+
             String stringmess = datagrampacketTostring(recv);
+
+
 
             receiver.dealWithPacket(stringmess);
 
@@ -129,7 +147,9 @@ public class MasterMind implements Runnable {
      * @return the message in the datagram
      */
     public String datagrampacketTostring ( DatagramPacket pack){
-        String result = new String(pack.getData());
+        byte[] buf = new byte[500];
+        buf = CutEmptyBytes(pack.getData());
+        String result = new String(buf);
         return  result;
     }
 
@@ -158,7 +178,8 @@ public class MasterMind implements Runnable {
                             "2",    // time to live
                             MESSAGE, //type of message
                             seqNrssent.get(message.substring(0,1)), // seqnr
-                            message.substring(1))).start();     //message
+                            message.substring(1))       //message
+                            ).start();
         } else {
             //if someone tried to send a message to an offlien node,
             // then it will tell the guy that it is not online

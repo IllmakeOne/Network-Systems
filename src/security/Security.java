@@ -40,11 +40,18 @@ public class Security {
         byte[] message = new byte[strEncrypted.length() / 8];
 
         for (int i = 0; i < strEncrypted.length(); i += 8) {
-            String substring = strEncrypted.substring(i, i + 8);
-            Integer substringAsInteger = Integer.valueOf(substring, 2);
-            int num = (int) substringAsInteger;
-            Byte b1 = (byte) num;
-            message[i / 8] = b1;
+        	try {
+				String substring = strEncrypted.substring(i, i + 8);
+				if (substring.length() != 8) {
+					break;
+				}
+				Integer substringAsInteger = Integer.valueOf(substring, 2);
+				int num = (int) substringAsInteger;
+				Byte b1 = (byte) num;
+				message[i / 8] = b1;
+			} catch (NumberFormatException e){
+
+			}
         }
 
         byte[] key = oneTimePads[Integer.valueOf(id)];
