@@ -11,6 +11,8 @@ public class Receiver {
 
     private  MasterMind mind;
 
+    private String mostrecentSeqnr;
+
 
     //this keeps in mind each time it receives a pulse from a node so it knows it's in the network
     private ConcurrentHashMap<String, Long> statuses;
@@ -43,22 +45,13 @@ public class Receiver {
                     if(seq.equals(mind.getseqNrssent().get(source))){
                         dealtwithAck(message);
                     }
-                } else if(type.equals(mind.MESSAGE)){
-                    if(seq.equals(mind.getseqNrsrcvd().get(source))){
+                } else if(type.equals(mind.MESSAGE)) {
+                    if (seq.equals(mind.getseqNrsrcvd().get(source))) {
                         dealwithMessage(message);
+                    } else if (seq.equals(mostrecentSeqnr)){
+                        dealwithOldMessage(message);
                     }
                 }
-//                       if( seq.equals(mind.getseqNrssent().get(source))) {
-//                           //System.out.println(message);
-//                           if (type.equals(mind.ACK)) {
-//                               if(mind.getSender().getoutStanding().get
-//                                       (message.substring(1,2))) {
-//                                   dealtwithAck(message);
-//                               }
-//                           } else {
-//                               dealwithMessage(message);
-//                           }
-//                       }
 
             } else if(destination.equals("0")){
                // System.out.println(message);
@@ -172,15 +165,32 @@ public class Receiver {
 
            //send to upper layer
          //  System.out.println(mess + " " +Integer.valueOf(message.substring(1, 2)));
-           mind.getGui().onMessageReceived(mess, Integer.valueOf(message.substring(1, 2)));
-
+           mind.getGui().onMessageReceived(mess, Integer.valueOf(source));
+           mostrecentSeqnr = mind.getseqNrsrcvd().get(source);
            mind.updateSeqRecvd(source);
        }
 
         // send ack package back to sender
         System.out.println("Ack sent for " + message);
-        mind.getSender().sendAck(message.substring(1,2), message.substring(4,5));
+        mind.getSender().sendAck(source, message.substring(4,5));
     }
+
+    /**
+     * this method sends an acknowledgement for a recent message
+     * it is called only if the messege's seq nr is smaller only by one
+     *
+     * This is a safe switch in case the original acknowledgement is lost
+     *
+     * @param message
+     */
+    public void dealwithOldMessage(String message){
+
+
+        String source = message.substring(1,2);
+
+        mind.getSender().sendAck(source, mostrecentSeqnr);
+    }
+
 
 
     /**

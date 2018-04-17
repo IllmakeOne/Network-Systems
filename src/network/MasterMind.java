@@ -22,7 +22,7 @@ public class MasterMind implements Runnable {
     public static final String MESSAGE = "m";
     public static final String PULSE = "p";
 
-    public static final int TIMEOUTLIMIT = 2000;
+    public static final int TIMEOUTLIMIT = 1500;
 
     public static final int OUTOFNETWORKTIMEOUT = 5000;
 
