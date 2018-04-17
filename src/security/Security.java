@@ -40,21 +40,23 @@ public class Security {
         byte[] message = new byte[strEncrypted.length() / 8];
 
         for (int i = 0; i < strEncrypted.length(); i += 8) {
-        	try {
-				String substring = strEncrypted.substring(i, i + 8);
-				if (substring.length() != 8) {
-					break;
-				}
-				Integer substringAsInteger = Integer.valueOf(substring, 2);
-				int num = (int) substringAsInteger;
-				Byte b1 = (byte) num;
-				message[i / 8] = b1;
-			} catch (NumberFormatException e){
-
-			}
+            String substring = strEncrypted.substring(i, i + 8);
+            if (substring.length() != 8) {
+                break;
+            }
+            Integer substringAsInteger = Integer.valueOf(substring, 2);
+            int num = (int) substringAsInteger;
+            Byte b1 = (byte) num;
+            message[i / 8] = b1;
         }
 
-        byte[] key = oneTimePads[Integer.valueOf(id)];
+        byte[] key;
+        // in case of global chat
+        if (from.equals("0")) {
+            key = oneTimePads[0];
+        } else {
+            key = oneTimePads[Integer.valueOf(id)];
+        }
 
         for (int i = 0; i < message.length && i < key.length; i++) {
             message[i] = (byte) (message[i] ^ key[i]);
@@ -65,7 +67,8 @@ public class Security {
 
     public static void main(String[] args) {
         Security security = new Security("1");
-        String encrypted = security.encrypt("asdgkadsgljk!~!!!!!sadjgasgdkljgsadj", "1");
+        String encrypted = security.encrypt("asdgsdakjlgadgslkjgadsljkkamjkklkljkl  hfh", "1");
         String decrypted = security.decrypt(encrypted, "1");
+        System.out.println(decrypted);
     }
 }
