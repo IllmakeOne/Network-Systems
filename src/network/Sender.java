@@ -100,10 +100,10 @@ public class Sender implements  Runnable{
                     + mind.getOwnName()  //from itself
                      + "2"               // time to live
                     + mind.MESSAGE       // type of package, message
-                    + mind.getSeqNers().get("0")        //global chat seq nr
+                    + mind.getseqNrsrcvd().get("0")        //global chat seq nr
                     + mind.getSecurity().encrypt(message.substring(1),"0"); // encode the message
 
-        mind.updateSeq("0");
+        mind.updateSeqRecvd("0");
 
         send(mesg);
 

@@ -35,8 +35,11 @@ public class MasterMind implements Runnable {
     private SceneSwitch gui;
 
 
-    //list to keep track of sequance numbers with other nodes
-    private HashMap<String, String> seqNrs;
+    //list to keep track of sequance numbers with other nodes, on the receving of messages from them
+    private HashMap<String, String> seqNrsrcvd;
+
+    //list to keep track of sequance numbers with other nodes, on the for the sending of messages
+    private HashMap<String, String> seqNrssent;
 
     //the socket used for receding and sending packages
     private MulticastSocket sock;
@@ -71,10 +74,11 @@ public class MasterMind implements Runnable {
         //initiate gui
         this.gui = gui;
         //initiate the seqace numbers map
-        seqNrs = new HashMap<>();
+        seqNrsrcvd = new HashMap<>();
+        seqNrssent = new HashMap<>();
 
         //initualize the sequance number fo global chat
-        seqNrs.put("0","0");
+        seqNrsrcvd.put("0","0");
 
         keys = new Security(ownName);
 
@@ -137,6 +141,7 @@ public class MasterMind implements Runnable {
 
       //  System.out.println(message + " In send msessage MAstermind");
 
+        //wait untill it is done with the previous message
         if(receiver.getStatuses().keySet().contains(message.substring(0,1))){
             while (sender.getoutStanding().get(message.substring(0, 1))) {
                 try {
@@ -147,11 +152,12 @@ public class MasterMind implements Runnable {
                 }
             }
 
+            //send a message in a new thread
             new Thread(() -> sender.sendMessage(message.substring(0,1),//destination
                              ownName,   // source
                             "2",    // time to live
                             MESSAGE, //type of message
-                            seqNrs.get(message.substring(0,1)), // seqnr
+                            seqNrssent.get(message.substring(0,1)), // seqnr
                             message.substring(1))).start();     //message
         } else {
             //if someone tried to send a message to an offlien node,
@@ -176,15 +182,30 @@ public class MasterMind implements Runnable {
      * increases the sequance number with a node by one
      * @param source
      */
-    public synchronized void updateSeq(String source){
+    public synchronized void updateSeqRecvd(String source){
       //  System.out.println("Changed Seq nr of " + source + " from " + getSeqNers().get(source));
-        if(getSeqNers().get(source).equals("9")){
-            getSeqNers().put(source,"0");
+        if(getseqNrsrcvd().get(source).equals("9")){
+            getseqNrsrcvd().put(source,"0");
         } else {
-            getSeqNers().put(source,
-                    String.valueOf(Integer.valueOf(getSeqNers().get(source)) + 1));
+            getseqNrsrcvd().put(source,
+                    String.valueOf(Integer.valueOf(getseqNrsrcvd().get(source)) + 1));
         }
       //  System.out.println("to " + getSeqNers().get(source));
+    }
+
+    /**
+     * increases the sequance number with a node by one
+     * @param source
+     */
+    public synchronized void updateSeqSent(String source){
+        //  System.out.println("Changed Seq nr of " + source + " from " + getSeqNers().get(source));
+        if(getseqNrssent().get(source).equals("9")){
+            getseqNrssent().put(source,"0");
+        } else {
+            getseqNrssent().put(source,
+                    String.valueOf(Integer.valueOf(getseqNrssent().get(source)) + 1));
+        }
+        //  System.out.println("to " + getSeqNers().get(source));
     }
 
 
@@ -192,9 +213,11 @@ public class MasterMind implements Runnable {
         this.on = false;
     }
 
-    public HashMap<String, String> getSeqNers(){
-        return seqNrs;
+    public HashMap<String, String> getseqNrsrcvd(){
+        return seqNrsrcvd;
     }
+
+    public HashMap<String, String> getseqNrssent(){ return seqNrssent;  }
 
     public String getOwnName(){
         return  ownName;

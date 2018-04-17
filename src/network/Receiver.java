@@ -39,21 +39,30 @@ public class Receiver {
             if (type.equals(mind.PULSE)) {
                 dealwithPulse(message);
             } else if(destination.equals(mind.getOwnName())){
-                       if( seq.equals(mind.getSeqNers().get(source))) {
-                           //System.out.println(message);
-                           if (type.equals(mind.ACK)) {
-                               if(mind.getSender().getoutStanding().get
-                                       (message.substring(1,2))) {
-                                   dealtwithAck(message);
-                               }
-                           } else {
-                               dealwithMessage(message);
-                           }
-                       }
+                if(type.equals(mind.ACK)){
+                    if(seq.equals(mind.getseqNrssent().get(source))){
+                        dealtwithAck(message);
+                    }
+                } else if(type.equals(mind.MESSAGE)){
+                    if(seq.equals(mind.getseqNrsrcvd().get(source))){
+                        dealwithMessage(message);
+                    }
+                }
+//                       if( seq.equals(mind.getseqNrssent().get(source))) {
+//                           //System.out.println(message);
+//                           if (type.equals(mind.ACK)) {
+//                               if(mind.getSender().getoutStanding().get
+//                                       (message.substring(1,2))) {
+//                                   dealtwithAck(message);
+//                               }
+//                           } else {
+//                               dealwithMessage(message);
+//                           }
+//                       }
 
             } else if(destination.equals("0")){
                // System.out.println(message);
-                if (seq.equals(mind.getSeqNers().get("0"))) {
+                if (seq.equals(mind.getseqNrsrcvd().get("0"))) {
                     delawithGlobalMessage(message.substring(5), source);
                 }
             }
@@ -79,9 +88,10 @@ public class Receiver {
             System.out.println(message.substring(0,1) + " has come online");
 
             //
-            mind.getSeqNers().put("0","0");
+            mind.getseqNrsrcvd().put("0","0");
+            mind.getseqNrssent().put(message.substring(0,1),"0");
            // statuses.put(message.substring(0,1),System.currentTimeMillis());
-            mind.getSeqNers().put(message.substring(0,1),"0");
+            mind.getseqNrsrcvd().put(message.substring(0,1),"0");
             mind.getSender().getoutStanding().put(message.substring(0,1),false);
 
         }
@@ -102,7 +112,7 @@ public class Receiver {
 
         mind.getGui().onGlobalMessageReceived(mind.getSecurity().decrypt(message,"0")
                 , Integer.valueOf(fromWho));
-        mind.updateSeq("0");
+        mind.updateSeqRecvd("0");
     }
 
 
@@ -118,7 +128,8 @@ public class Receiver {
             if(now - statuses.get(key) > mind.OUTOFNETWORKTIMEOUT){
                 System.out.println(key + " has gone offline");
                 statuses.remove(key);
-                mind.getSeqNers().remove(key);
+                mind.getseqNrsrcvd().remove(key);
+                mind.getseqNrssent().remove(key);
             }
         }
     }
@@ -143,7 +154,7 @@ public class Receiver {
         //System.out.println("Received ACk");
         mind.getSender().receivedAck(source);
 
-        mind.updateSeq(source);
+        mind.updateSeqSent(source);
 
     }
 
@@ -154,7 +165,8 @@ public class Receiver {
         //arecentMessage.put(message.substring(1,2), message.g)
 
        if(destination.equals("0")){
-           mind.getGui().onMessageReceived(mess, Integer.valueOf("0"));
+           mind.getGui().onGlobalMessageReceived(mess, Integer.valueOf(source));
+           mind.updateSeqRecvd("0");
        } else {
 
 
@@ -162,7 +174,7 @@ public class Receiver {
          //  System.out.println(mess + " " +Integer.valueOf(message.substring(1, 2)));
            mind.getGui().onMessageReceived(mess, Integer.valueOf(message.substring(1, 2)));
 
-           mind.updateSeq(source);
+           mind.updateSeqRecvd(source);
        }
 
         // send ack package back to sender
