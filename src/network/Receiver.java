@@ -70,11 +70,10 @@ public class Receiver {
                 }
             }
 
-            //forward pack if it is not destined for itself
-            // and it is not from itself, forwarding your own packages is redundant
-            if(!destination.equals(mind.getOwnName())) {
-                forwardPack(message);
-            }
+            //forward pack if its source is not itself
+            forwardPack(message);
+            
+
         }
     }
 
