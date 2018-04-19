@@ -20,14 +20,15 @@ public class MasterMind implements Runnable {
     //Some protocol finals
     public static final String ACK = "a";
     public static final String MESSAGE = "m";
-    public static final String PULSE = "p";
+    public static final String PULSE = "p"; //periodic message sent to announce the presence of the node
 
+    //timeout of sent messages before retransmitting
     public static final int TIMEOUTLIMIT = 1500;
 
+    //limit of time untill a node is consider offline if not received any pulses from it
     public static final int OUTOFNETWORKTIMEOUT = 5000;
 
-    private boolean on;
-
+    public boolean on;
 
     //own name
     private String ownName;
@@ -110,6 +111,11 @@ public class MasterMind implements Runnable {
         return Arrays.copyOf(msg, index + 1);
     }
 
+
+    /**
+     * this is for receiving messages
+     * all the messages are sent to the Receiver and are dealt with on this thread
+     */
     @Override
     public void run() {
 
@@ -156,17 +162,18 @@ public class MasterMind implements Runnable {
     /**
      * this will start a new thread for sending a message
      * the thread will end after the node receives and ack for that sent message
+     * @param message is the message, the first character of it is the direction it going in
      */
     public void sendMessage(String message){
 
-      //  System.out.println(message + " In send msessage MAstermind");
 
-        //wait untill it is done with the previous message
+        //test if node is online
         if(receiver.getStatuses().keySet().contains(message.substring(0,1))){
+
+            //wait until it is done with the previous message
             while (sender.getoutStanding().get(message.substring(0, 1))) {
                 try {
                     TimeUnit.MILLISECONDS.sleep(50);
-                    //System.out.println("waiting to finish up his messageing");
                 } catch (InterruptedException e) {
                     System.err.println("could not wait int Mastermind SendMessage,for some reason");
                 }
@@ -181,18 +188,16 @@ public class MasterMind implements Runnable {
                             message.substring(1))       //message
                             ).start();
         } else {
-            //if someone tried to send a message to an offlien node,
-            // then it will tell the guy that it is not online
+            //if someone tried to send a message to an offline node,
+            // tell the user the node is not online
             if(!message.substring(0,1).equals("0")) {
                 gui.onMessageReceived(gui.OFFLINE,
                         Integer.valueOf(message.substring(0, 1)));
             }
-            //System.out.println("node not online");
         }
 
         //for all chat
         if(message.substring(0,1).equals("0")){
-           // System.out.println(getSeqNers().get("0") + " Trying to send message in mastermind " );
             new Thread(() -> sender.sendGlobalMessage(message)).start();
         }
 
@@ -200,7 +205,7 @@ public class MasterMind implements Runnable {
 
 
     /**
-     * increases the sequance number with a node by one
+     * increases the sequence number for receiving from a node by one
      * @param source
      */
     public synchronized void updateSeqRecvd(String source){
@@ -211,11 +216,10 @@ public class MasterMind implements Runnable {
             getseqNrsrcvd().put(source,
                     String.valueOf(Integer.valueOf(getseqNrsrcvd().get(source)) + 1));
         }
-      //  System.out.println("to " + getSeqNers().get(source));
     }
 
     /**
-     * increases the sequance number with a node by one
+     * increases the sequance number for sending to a node by one
      * @param source
      */
     public synchronized void updateSeqSent(String source){
@@ -271,9 +275,5 @@ public class MasterMind implements Runnable {
     public SceneSwitch getGui(){
         return  gui;
     }
-
-
-
-
 
 }

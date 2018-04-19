@@ -8,11 +8,16 @@ import java.util.concurrent.TimeUnit;
 
 public class Sender implements  Runnable{
 
+    //the socket with which it will broadcast messages
     private MulticastSocket sock;
+
+    //parent MasterMind
     private MasterMind mind;
+
     // map of the nodes still waiting for a reply
     private HashMap<String, Boolean> outStanding;
 
+    //the pusle of this shaped in the constructor
     private String mypulse = "";
 
     //map of timeouts
@@ -20,18 +25,18 @@ public class Sender implements  Runnable{
 
 
     public Sender(MulticastSocket socket, MasterMind mind){
+
         this.sock = socket;
         this.mind = mind;
 
-        outStanding = new HashMap<String, Boolean>();
+        outStanding = new HashMap<>();
         timeouts = new HashMap<>();
 
 
-        mypulse = mind.getOwnName() //the name
+        mypulse = mind.getOwnName() //the name of this node
                 + mind.getOwnName() // it is double so the protocol is respected
-                + "2" // time to live
-                + mind.PULSE // type of message
-                + "0";
+                + "2"               // time to live
+                + mind.PULSE;       // type of message
 
     }
 
@@ -58,14 +63,15 @@ public class Sender implements  Runnable{
                 + seqNr // seq number
                 + mind.getSecurity().encrypt(payload,destination); // encoded message
 
-       // System.out.println(mesg + " made in send Message in Sender");
-
+        //send the message
         send(mesg);
-
-        outStanding.put(mesg.substring(0,1),true);//note down its waiting for an ack
-        timeouts.put(destination, System.currentTimeMillis());//note down time for the timeout calcualtion
+        //note down that its waiting for an ack from the destination of the message
+        outStanding.put(mesg.substring(0,1),true);
+        //note down time of the sending of the message for calculation of timeout
+        timeouts.put(destination, System.currentTimeMillis());
 
         while(outStanding.get(destination) == true){
+            //if it times out, resend message
             if (System.currentTimeMillis() - timeouts.get(destination) > mind.TIMEOUTLIMIT){
                 count++;
                 timeouts.put(destination, System.currentTimeMillis());
@@ -74,6 +80,7 @@ public class Sender implements  Runnable{
 
                 System.err.println("Retransmitting  message");
             }
+            //if it retransmitted the message 5 time already, the node probably went offline, so give up
             if(count >5 ){
                 break;
             }
@@ -85,9 +92,6 @@ public class Sender implements  Runnable{
         } else {
             System.out.println("got Ack for " + payload);
         }
-
-        //change the sequance number asociated to a node
-        //mind.updateSeq(detination);
 
     }
 
@@ -107,7 +111,6 @@ public class Sender implements  Runnable{
 
         send(mesg);
 
-       // System.out.println(mind.getSeqNers().get("0") +  "message sent");
     }
 
 
@@ -129,14 +132,11 @@ public class Sender implements  Runnable{
 
 
     /**
-     * this method notifies the sender that it got an ack for its latest package
+     * this method notifies the sender that it got an ack for it most recent package sent towards the source
      * @param source
      */
-
     public void receivedAck(String source){
-       // System.out.println("Changed for "+ source + " to false");
         outStanding.put(source, false);
-        //System.out.println(outStanding.get(source));
     }
 
 
@@ -171,7 +171,7 @@ public class Sender implements  Runnable{
     }
 
     /**
-     * this fucntions takes a message, makes it into a datagrampackage and sends it into the network
+     * this method takes a String message, transforms it into a DatagramPacket and sends it in the network
      * @param message
      */
     public void send(String message){
@@ -186,7 +186,7 @@ public class Sender implements  Runnable{
     }
 
     /**
-     * Make a String into a Datagram
+     * Make a String into a DatagramPacket
      * @param message the message being converted
      * @return the message converted
      */
